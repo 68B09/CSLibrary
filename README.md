@@ -1,5 +1,5 @@
 # CSLibrary
-C#—pƒNƒ‰ƒXŒQ
+C#ç”¨ã‚¯ãƒ©ã‚¹ç¾¤
 ======================
 CSLibrary 
  + ExGraphics 
@@ -7,37 +7,37 @@ CSLibrary
  + ExUnicode 
     + UnicodeUtilities.cs 
  
-‘z’èŒ¾ŒêEƒo[ƒWƒ‡ƒ“
+æƒ³å®šè¨€èªžãƒ»ãƒãƒ¼ã‚¸ãƒ§ãƒ³
 ------
 C#/.NET Framework 4.5.2 
 
 ExDrawString.cs
 ------
-(’ˆÓ)ì¬’† 
-c‘‚«E‰¡‘‚«‘Î‰ž‚ÌŠg’£DrawStringƒNƒ‰ƒXB 
-‹éŒ`“à‚ÉŽû‚Ü‚é‚æ‚¤‚ÉƒtƒHƒ“ƒgƒTƒCƒY‚ðk¬‚µ‚½‚èA‹Ï“™Š„‚è•t‚¯‚ª‰Â”\‚É‚È‚é—\’èB 
-®A.net(Windows)‚ÌŽd—l‚É‚æ‚èIVS•t‚«‚Ì•¶Žš‚Í³‚µ‚­•`‰æo—ˆ‚È‚¢B
-¦IVS‚ª ‚Å•`‰æ‚³‚ê‚Ä‚µ‚Ü‚¤ 
+(æ³¨æ„)ä½œæˆä¸­ 
+ç¸¦æ›¸ããƒ»æ¨ªæ›¸ãå¯¾å¿œã®æ‹¡å¼µDrawStringã‚¯ãƒ©ã‚¹ã€‚ 
+çŸ©å½¢å†…ã«åŽã¾ã‚‹ã‚ˆã†ã«ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’ç¸®å°ã—ãŸã‚Šã€å‡ç­‰å‰²ã‚Šä»˜ã‘ãŒå¯èƒ½ã«ãªã‚‹äºˆå®šã€‚ 
+å°šã€.net(Windows)ã®ä»•æ§˜ã«ã‚ˆã‚ŠIVSä»˜ãã®æ–‡å­—ã¯æ­£ã—ãæç”»å‡ºæ¥ãªã„ã€‚
+â€»IVSãŒâ–¡ã§æç”»ã•ã‚Œã¦ã—ã¾ã† 
  
 UnicodeUtilities.cs
 ------
-Unicode•¶Žš‚ðˆµ‚¤ã‚Å‚ÌŠeŽí•Ö—˜ŠÖ”‚ðW‚ß‚½ƒNƒ‰ƒXB 
-E”¼Šp‘SŠp”»’è 
-E”¼Šp‘SŠp•ÏŠ· 
-EŠOŽš”»’è 
-Eƒ^ƒu¨‹ó”’•¶Žš•ÏŠ· 
-Es•ªŠ„ 
-E‚P•¶Žš‚É•ª‰ð 
+Unicodeæ–‡å­—ã‚’æ‰±ã†ä¸Šã§ã®å„ç¨®ä¾¿åˆ©é–¢æ•°ã‚’é›†ã‚ãŸã‚¯ãƒ©ã‚¹ã€‚ 
+ãƒ»åŠè§’å…¨è§’åˆ¤å®š 
+ãƒ»åŠè§’å…¨è§’å¤‰æ› 
+ãƒ»å¤–å­—åˆ¤å®š 
+ãƒ»ã‚¿ãƒ–â†’ç©ºç™½æ–‡å­—å¤‰æ› 
+ãƒ»è¡Œåˆ†å‰² 
+ãƒ»ï¼‘æ–‡å­—ã«åˆ†è§£ 
 etc..
 
-ƒ‰ƒCƒZƒ“ƒX
+ãƒ©ã‚¤ã‚»ãƒ³ã‚¹
 ------
-ƒ‰ƒCƒZƒ“ƒX‚ð“K—p‚·‚éƒtƒ@ƒCƒ‹‚É‚Íƒ‰ƒCƒZƒ“ƒX‚É‚Â‚¢‚Ä‚Ì‹Lq‚ª‚ ‚è‚Ü‚·B  
+ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã‚’é©ç”¨ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã«ã¯ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã«ã¤ã„ã¦ã®è¨˜è¿°ãŒã‚ã‚Šã¾ã™ã€‚  
 The MIT License (MIT)  
 Copyright (c) 2021 68B09 
 see also 'LICENSE' file 
  
-—š—ð
+å±¥æ­´
 -----
 2021/7/22 68B09 
 First release. 
