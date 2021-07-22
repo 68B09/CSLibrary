@@ -2,10 +2,8 @@
 C#用クラス群
 ======================
 CSLibrary 
- + ExGraphics 
- |  + ExDrawString.cs 
- + ExUnicode 
-    + UnicodeUtilities.cs 
+ExGraphics\ExDrawString.cs 
+ExUnicode\UnicodeUtilities.cs 
  
 想定言語・バージョン
 ------
