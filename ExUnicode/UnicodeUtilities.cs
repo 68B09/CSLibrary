@@ -25,13 +25,20 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using System.Linq;
 
 namespace CSLibrary.ExUnicode
 {
 	/// <summary>
 	/// UnicodeUtility
 	/// </summary>
+	/// <remarks>
+	/// Windowsおよび.netは文字(Unicode)をUTF-16で表現します。
+	/// そのためU+10000以上の文字はサロゲートペアとして表現するため、本クラス内のメソッドは基本的に
+	/// int型、char型、string型
+	/// の３パターンで呼び出せるよう用意されています。
+	/// このうちint型はUTF-32(U+0000～U+10FFFF)を、char型はBMPもしくはUCS-2を、string型はサロゲートペアや
+	/// IVS付きの文字を扱う想定です。
+	/// </remarks>
 	public class UnicodeUtility
 	{
 		#region 固定値

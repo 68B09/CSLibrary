@@ -29,6 +29,9 @@ using CSLibrary.ExUnicode;
 
 namespace CSLibrary.ExGraphics
 {
+	/// <summary>
+	/// 拡張DrawString
+	/// </summary>
 	public class ExDrawString
 	{
 		#region デバッグ用
@@ -85,6 +88,16 @@ namespace CSLibrary.ExGraphics
 		{
 		}
 		#endregion
+
+		/// <summary>
+		/// 文字列描画(座標個別指定)
+		/// </summary>
+		/// <param name="pText">文字列</param>
+		/// <param name="pGraphics">Graphics</param>
+		/// <param name="pX">X座標(横書き時=左上、縦書き時=右上)</param>
+		/// <param name="pY">Y座標(横書き時=左上、縦書き時=右上)</param>
+		/// <param name="pWidth">幅</param>
+		/// <param name="pHeight">高さ</param>
 		public void Draw(string pText, Graphics pGraphics, int pX, int pY, int pWidth, int pHeight)
 		{
 			Rectangle rect = new Rectangle(pX, pY, pWidth, pHeight);
@@ -92,7 +105,7 @@ namespace CSLibrary.ExGraphics
 		}
 
 		/// <summary>
-		/// 文字列描画
+		/// 文字列描画(座標Rectangle指定)
 		/// </summary>
 		/// <param name="pText">文字列</param>
 		/// <param name="pGraphics">Graphics</param>
@@ -112,27 +125,11 @@ namespace CSLibrary.ExGraphics
 			try {
 				LineDataCollection list = this.CreateDrawData(pText, pGraphics, this.Font, pRect.Width, pRect.Height, this.FormatFlag);
 				using (list.Font) {
-#if false
-#if DEBUG
-					if (list.Vertical == false) {
-						pGraphics.DrawRectangle(this.penRed, x, y, pRect.Width, pRect.Height);
-						pGraphics.DrawRectangle(this.penWhite, x, y, list.Width, list.Height);
-					} else {
-						pGraphics.DrawRectangle(this.penRed, x - pRect.Width, y, pRect.Width, pRect.Height);
-						pGraphics.DrawRectangle(this.penWhite, x - list.Width, y, list.Width, list.Height);
-					}
-#endif
-#endif
 					foreach (LineData line in list) {
 						foreach (CharData chars in line.CharDataCollection) {
 							float xx = x + chars.X;
 							float yy = y + chars.Y;
 							pGraphics.DrawString(chars.Text, list.Font, this.Brush, xx, yy, list.StringFormat);
-#if false
-#if DEBUG
-							pGraphics.DrawRectangle(penGreen, xx, yy, 1, 1);
-#endif
-#endif
 						}
 					}
 				}
