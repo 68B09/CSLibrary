@@ -27,7 +27,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using CSLibrary.ExUnicode;
 
-namespace CSLibrary.ExGraphics
+namespace CSLibrary
 {
 	/// <summary>
 	/// 拡張DrawString

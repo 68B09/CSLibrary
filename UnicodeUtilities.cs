@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace CSLibrary.ExUnicode
+namespace CSLibrary
 {
 	/// <summary>
 	/// UnicodeUtility
