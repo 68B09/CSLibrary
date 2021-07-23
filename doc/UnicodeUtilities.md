@@ -33,6 +33,25 @@ UTF-16を扱う上でサロゲートペアは避けて通れないため、.net�
 どのメソッドも壊れたサロゲートを渡しても構いませんが、そのときは全角(false)を返します。  
 このときサロゲートペア1文字が全角2文字となることに注意して下さい。
 
+    UnicodeUtility uu = new UnicodeUtility();  
+    uu.IsHankaku(0x41);    // true
+    uu.IsHankaku(0x29E3D); // true  U+29E3D=𩸽
+    uu.IsHankaku('A');     // true
+    uu.IsHankaku('あ');    // false
+    uu.IsHankaku("A");     // true
+    uu.IsHankaku("𩸽");    // false
+    uu.IsHankaku("蝕󠄀");    // false 蝕=U+8755,E0100(0xDB40,0xDD00)
+
+    uu.YenSignA5IsFullWidth = false;  // default
+    uu.IsHankaku('\');    // true U+5C
+    uu.IsHankaku('¥');    // true U+A5
+    uu.IsHankaku('￥');   // false U+FFE5
+
+    uu.YenSignA5IsFullWidth = true;
+    uu.IsHankaku('\');    // true U+5C
+    uu.IsHankaku('¥');    // false U+A5
+    uu.IsHankaku('￥');   // false U+FFE5
+
 ■**外字判定**
 ------
 **GaijiTypes IsGaiji(int pUTF32)**  
@@ -41,9 +60,21 @@ UTF-16を扱う上でサロゲートペアは避けて通れないため、.net�
 
 どのメソッドにも1文字を渡して下さい。  
 渡された文字が外字(私用文字)であるかを判定し GaijiTypes を返します。  
-|GaijiTypes|a|
+|GaijiTypes||
 ----|----
 |None|外字では無い|
 |uE800|U+E800系の外字|
 |uF0000|U+F0000系の外字|
 |u100000|U+10000系の外字|
+
+■**非文字判定**
+------
+**bool IsHimoji(int pUTF32)**  
+**bool IsHimoji(char pChar)**  
+**bool IsHimoji(string pString)**  
+
+どのメソッドにも1文字を渡して下さい。  
+渡された文字が非文字であるかを判定し、非文字であれば true を返します。  
+非文字とは下記の文字を指します。  
++ U+FDD0～FDEF
++ U+xxFFFE～xxFFFF (各面の下位16bit)
