@@ -1,6 +1,6 @@
 # UnicodeUtility
 ## **概要**
-==========   
+==========
 Unicodeを扱いやすくするためのクラスです。  
 .net(Windows)は文字コードとしてUnicode、そのエンコードにUTF-16を使用しており、1文字はChar型(*2Byte)で表します。  
 UTF-16を扱う上でサロゲートペアは避けて通れないため、.netではこれをString型もしくはChar[2]、またはInt型(32bit、UTF-32)で扱う必要があります。  
