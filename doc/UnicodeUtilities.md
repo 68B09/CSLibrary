@@ -5,10 +5,12 @@ Unicodeを扱いやすくするためのクラスです。
 .net(Windows)は文字コードとしてUnicode、そのエンコードにUTF-16を使用しており、1文字はChar型(2Byte)で表します。  
 UTF-16を扱う上でサロゲートペアは避けて通れないため、.netではこれをString型もしくはChar[2]、またはInt型(32bit、UTF-32)で扱う必要があります。  
 本クラスではそれらを考慮して3つの型を引数に取るメソッドが用意されています、  
-(例外あり)  
+(例外あり)
 1. UCS-2を想定した(Char)型  
 1. サロゲートペアやIVS付きの文字を扱う(String)型  
 1. UTF-32で文字を扱う(Int)型  
+
+動作に関してはソースファイルも参照して下さい。
 
 ■**簡易半角全角判定**
 ------
@@ -78,3 +80,70 @@ UTF-16を扱う上でサロゲートペアは避けて通れないため、.net�
 非文字とは下記の文字を指します。  
 + U+FDD0～FDEF
 + U+xxFFFE～xxFFFF (各面の下位16bit)
+
+■**使用可能文字判定**
+------
+**int CheckValidChar(string pString, params char[] pValidChars)**  
+**int CheckValidChar(string pString, string pValidChars)**  
+**int CheckValidChar(string pString, char pStart, char pEnd)**  
+**int CheckValidCode(string pString, int pStartUTF32, int pEndUTF32)**  
+
+指定された文字(char単位)で構成されているかをチェックします。  
+指定外の文字が使用されている場合は0以上の値(char配列内インデックス)を返します。  
+指定された文字のみで構成されている場合は -1 を返します。  
+`("ABCD", 'A','B','C')` と `("ABCD", "ABC")` と `("ABCD", 'A','C')`  と `("ABCD", 0x41,0x43)` は同じ意味です。  
+
+    // 半角数字のみで構成されているかチェック
+    uu.CheckValidChar(inputText, "0123456789");
+
+    // ASCII文字のみで構成されているかチェック
+    uu.CheckValidChar(inputText, 0x00,0x7F);
+
+■**文字列長取得**
+------
+**int GetHalfWidthLength(string pString)**  
+**int GetHalfWidthLengthBySurrogate(string pString)**  
+**int GetHalfWidthLengthByVS(string pString)**  
+
+半角文字を1とした文字列長を返します。  
+GetHalfWidthLength() はchar単位で長さを得るため、サロゲートぺア1文字は半角4文字(全角2文字)で計算されます。  
+～BySurrogate() はサロゲートペアを考慮しますがIVSなどは無視するため、基本文字とIVSが個別に計算されます。  
+～ByVS() はサロゲートぺアもIVSも合成文字も考慮して計算します。  
+尚、合成文字の組み合わせは.netの StringInfo クラスの仕様に準じます。
+
+    GetHalfWidthLength("Aあ");    // 3
+
+    GetHalfWidthLength("蝕󠄀");     // 6
+    GetHalfWidthLengthBySurrogate("蝕󠄀"); // 4
+    GetHalfWidthLengthByVS("蝕󠄀"); // 2
+
+■**タブ→スペース変換**
+------
+**string TabToSpace(string pString, int pTabSize = 8)**
+
+タブ文字を空白文字に展開した結果を返します。  
+タブサイズは pTabSize で2以上を指定します。  
+サロゲートぺアやIVSなどは一切考慮しません。  
+
+■**１文字単位に分解**
+------
+**IEnumerable<string> CharacterEnumeratorBySurrogate(string pString)**  
+**IEnumerable<string> CharacterEnumeratorByVS(string pString)**  
+**IEnumerable<int> ConvertToUtf32(string pString)**  
+
+文字列から1文字を切り出します。  
+～BySurrogate() はサロゲートぺアを考慮しますがIVSや合成文字などは無視します。  
+～ByVS()は サロゲートぺアもIVSも合成文字も考慮します。  
+尚、合成文字の組み合わせは.netの StringInfo クラスの仕様に準じます。  
+
+ConvertToUtf32() の動作は CharacterEnumeratorBySurrogate() と同じで、1文字をstring(サロゲートぺア)で返すかint(コードポイント)で返すかの違いのみです。  
+
+3メソッド共に IEnumerable を返します。  
+配列で欲しい場合は `List<int>(UnicodeUtility.ConvertToUtf32("ABC"))` などで受け取って下さい。  
+
+    UnicodeUtility.CharacterEnumeratorBySurrogate("Aあ");  //[0]="A" [1]='あ'
+
+    UnicodeUtility.CharacterEnumeratorBySurrogate("蝕󠄀");   //[0]="蝕"(U+8755) [1]='□'(0xDB40,0xDD00)
+    UnicodeUtility.CharacterEnumeratorByVS("蝕󠄀");          //[0]="蝕󠄀"(U+8755,DB40,DD00)
+
+無印(By無し)のメソッドが存在しないのは、単に `foreach(char c in "ABC"){～}` と書けば良いからです。
