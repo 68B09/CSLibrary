@@ -27,6 +27,15 @@ Unicode文字を扱う上での各種便利関数を集めたクラス。
 ・行分割  
 ・１文字に分解  
 etc..  
+
+CSVAssistant
+------
+CSVファイルを読み書きするためのクラス。  
+
+WaitCursor
+------
+時間がかかる処理をusingで囲み、処理が終わるまでマウスカーソルを「ウェイトカーソル」にするクラス。  
+
   
 ライセンス
 ------
@@ -37,5 +46,8 @@ see also 'LICENSE' file
   
 履歴
 -----
+2021/8/2 68B09  
+CSVAssistant.cs、WaitCursor.csを追加。  
+  
 2021/7/22 68B09  
 First release.
