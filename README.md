@@ -45,7 +45,6 @@ SharedData
 ライセンスを適用するファイルにはライセンスについての記述があります。   
 The MIT License (MIT)  
 Copyright (c) 2021 68B09  
-see also 'LICENSE' file  
   
 履歴
 -----
