@@ -41,11 +41,18 @@ ___
 リングバッファ  
 ```
 RingBuffer<int> buffer = new RingBuffer<int>(5); // buffer size = 5
-buffer.Write(10);
-buffer.Write(20);
-int count = buffer.Count	// count = 2
-int data = buffer.Read();	// data = 10
-int data = buffer.Read();	// data = 20
+// datacount=0,remain=5
+buffer.Write(10);		// datacount=1,remain=4
+buffer.Write(20);		// datacount=2,remain=3
+buffer.Write(30);		// datacount=3,remain=2
+count = buffer.Count;	// count=3
+count = buffer.Capacity;// count=5(buffer size)
+data = buffer.Read();	// data=10,count=2,remain=3
+data = buffer.Read();	// data=20,count=1,remain=4
+buffer.Clear();			// count=0,remain=5
+buffer.Capacity=10;		// バッファ数を10に拡張。Count以上であれば縮小も可能。基本的にCapacityへの代入はおすすめしない。最初から最適なバッファ数を指定するべき。
+buffer.WriteRange(new int[5] { 0, 1, 2, 3, 4 });// datacount=5,remain=5
+
 ```
 ___
 ## ライセンス
