@@ -10,7 +10,7 @@ C#/.net framework 4.5.2
 尚、.net(Windows)の仕様によりIVS付きの文字は正しく描画出来ない。  
 ※IVSが□で描画されてしまう  
 ****
-## ●UnicodeUtilities
+## ●[UnicodeUtilities](/doc/UnicodeUtilities.md)
 Unicode文字を扱う上での各種便利関数を集めたクラス。  
 ・半角全角判定  
 ・半角全角変換  
