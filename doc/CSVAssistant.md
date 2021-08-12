@@ -36,17 +36,17 @@ true の場合は囲み文字を付加します。
 全レコードを格納した CSVRecordCollection を返します。  
 ファイルサイズに比例したメモリ量を消費するため、サイズが大きなファイルの読み込みには不向きです。  
 
-	CSVAssistant csv = new CSVAssistant();  
-	CSVRecordCollection list = csv.ReadRecords(sr);
-	for(int recidx = 0; recidx < list.Count; recidx++){
-		CSVRecord rec = list[recidx];
-		if(rec.Count >= 1){				// 項目が1個以上存在するか？
-			string item1 = rec[0].Text; // 項目を取得。囲み文字は含まれない。
-			if(rec[0].Quoted){			// 項目は囲まれていた？
-				囲まれていた場合の処理();
-			}
-		}
-	}
+    CSVAssistant csv = new CSVAssistant();  
+    CSVRecordCollection list = csv.ReadRecords(sr);
+    for(int recidx = 0; recidx < list.Count; recidx++){
+        CSVRecord rec = list[recidx];
+        if(rec.Count >= 1){             // 項目が1個以上存在するか？
+            string item1 = rec[0].Text; // 項目を取得。囲み文字は含まれない。
+            if(rec[0].Quoted){          // 項目は囲まれていた？
+                囲まれていた場合の処理();
+            }
+        }
+    }
 
 **public CSVRecord ReadRecord(StreamReader pReader)**  
 １レコードを読み込んで CSVRecord を返します。  
@@ -54,16 +54,16 @@ true の場合は囲み文字を付加します。
 ビッグサイズのファイルから読み込む場合に適しています。  
 全てのレコードを取得し終えるまでは pReader を操作しないで下さい。  
 
-	CSVAssistant csv = new CSVAssistant();  
-	int recidx = 0;
-	while(true){
-		CSVRecord rec = csv.ReadRecord(sr);
-		if(rec == null){
-			break;
-		}
-		string item1 = rec[0].Text;
-		recidx++;
-	}
+    CSVAssistant csv = new CSVAssistant();  
+    int recidx = 0;
+    while(true){
+        CSVRecord rec = csv.ReadRecord(sr);
+        if(rec == null){
+            break;
+        }
+        string item1 = rec[0].Text;
+        recidx++;
+    }
 
 ●**書き込み**  
 -----
@@ -97,17 +97,17 @@ true の場合は囲み文字を付加します。
 
 **public void WriteLine(StreamWriter pStream)**  
 改行を書き出します。  
+レコード終了を表す改行は必ず本メソッドを呼び出して書き込んで下さい。  
 
+    CSVAssistant csv = new CSVAssistant();  
+    csv.WriteReset();
+    for(int idx = 123; … ){
+        csv.Write(sw, idx);
+        csv.Write(sw, "ABC\r\nDEF");
+        csv.Write(sw, Math.PI, "0.00");
+        csv.WriteLine(sw);  // 行末の改行
+    }
 
-	CSVAssistant csv = new CSVAssistant();  
-	csv.WriteReset();
-	for(int idx = 123; … ){
-		csv.Write(sw, idx);
-		csv.Write(sw, "ABC\r\nDEF");
-		csv.Write(sw, Math.PI, "0.00");
-		csv.WriteLine(sw);				// 改行
-	}
-
-	writefile
-	123,"ABC\r\n
-	DEF",3.14\r\n
+    writefile
+    123,"ABC\r\n
+    DEF",3.14\r\n
