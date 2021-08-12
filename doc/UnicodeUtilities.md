@@ -12,7 +12,7 @@ UTF-16を扱う上でサロゲートペアは避けて通れないため、.net�
 
 動作に関してはソースファイルも参照して下さい。
 
-■**簡易半角全角判定**
+●**簡易半角全角判定**
 ------
 **bool IsHankaku(int pUTF32)**  
 **bool IsHankaku(char pChar)**  
@@ -54,7 +54,7 @@ UTF-16を扱う上でサロゲートペアは避けて通れないため、.net�
     uu.IsHankaku('¥');    // false U+A5
     uu.IsHankaku('￥');   // false U+FFE5
 
-■**外字判定**
+●**外字判定**
 ------
 **GaijiTypes IsGaiji(int pUTF32)**  
 **GaijiTypes IsGaiji(char pChar)**  
@@ -69,7 +69,7 @@ UTF-16を扱う上でサロゲートペアは避けて通れないため、.net�
 |uF0000|U+F0000系の外字|
 |u100000|U+10000系の外字|
 
-■**非文字判定**
+●**非文字判定**
 ------
 **bool IsHimoji(int pUTF32)**  
 **bool IsHimoji(char pChar)**  
@@ -81,7 +81,7 @@ UTF-16を扱う上でサロゲートペアは避けて通れないため、.net�
 + U+FDD0～FDEF
 + U+xxFFFE～xxFFFF (各面の下位16bit)
 
-■**使用可能文字判定**
+●**使用可能文字判定**
 ------
 **int CheckValidChar(string pString, params char[] pValidChars)**  
 **int CheckValidChar(string pString, string pValidChars)**  
@@ -99,7 +99,7 @@ UTF-16を扱う上でサロゲートペアは避けて通れないため、.net�
     // ASCII文字のみで構成されているかチェック
     uu.CheckValidChar(inputText, 0x00,0x7F);
 
-■**文字列長取得**
+●**文字列長取得**
 ------
 **int GetHalfWidthLength(string pString)**  
 **int GetHalfWidthLengthBySurrogate(string pString)**  
@@ -117,7 +117,7 @@ GetHalfWidthLength() はchar単位で長さを得るため、サロゲートぺ�
     GetHalfWidthLengthBySurrogate("蝕󠄀"); // 4
     GetHalfWidthLengthByVS("蝕󠄀"); // 2
 
-■**タブ→スペース変換**
+●**タブ→スペース変換**
 ------
 **string TabToSpace(string pString, int pTabSize = 8)**
 
@@ -125,7 +125,7 @@ GetHalfWidthLength() はchar単位で長さを得るため、サロゲートぺ�
 タブサイズは pTabSize で2以上を指定します。  
 サロゲートぺアやIVSなどは一切考慮しません。  
 
-■**１文字単位に分解**
+●**１文字単位に分解**
 ------
 **IEnumerable<string> CharacterEnumeratorBySurrogate(string pString)**  
 **IEnumerable<string> CharacterEnumeratorByVS(string pString)**  
@@ -147,3 +147,82 @@ ConvertToUtf32() の動作は CharacterEnumeratorBySurrogate() と同じで、1�
     UnicodeUtility.CharacterEnumeratorByVS("蝕󠄀");          //[0]="蝕󠄀"(U+8755,DB40,DD00)
 
 無印(By無し)のメソッドが存在しないのは、単に `foreach(char c in "ABC"){～}` と書けば良いからです。
+
+●**半角文字を全角文字に変換**
+------
+**public string ConvertHalfToFullWidthNumber(string pString)** '0'~'9'(U+30～U+39)のみを変換  
+**public string ConvertHalfToFullWidthAlphabet(string pString)**  'A'~'Z','a'～'z'(U+41～U+5A,U+61～U+7A)のみを変換  
+**public string ConvertHalfToFullWidthMark(string pString)** 半角記号のみを変換  
+**public string ConvertHalfToFullWidth(string pString)**  上記変換に加えて片仮名も変換する  
+
+半角文字を全角文字に変換した文字列を返します。  
+円記号(U+5C及びU+A5)を全角に変換したく無い場合は、ReplaceFlag に YenSign_Ignore を設定して下さい。
+円記号(U+A5)は全角へ変換したいが円記号(U+5C)は全角に変換したく無い場合は、ReplaceFlag に H2FJISYenSign_Ignore を設定して下さい。
+
+●**全角文字を半角文字に変換**
+------
+**public string ConvertFullToHalfWidthNumber(string pString)**  
+**public string ConvertFullToHalfWidthAlphabet(string pString)**  
+**public string ConvertFullToHalfWidthMark(string pString)**  
+**public string ConvertFullToHalfWidth(string pString)**  
+
+●**全角平仮名<->全角片仮名変換**  
+-----
+**public string ConvertHiraganaToKatakana(string pString)**  
+**public string ConvertKatakanaToHiragana(string pString)**  
+
+●**左端から文字列を取り出す**
+-----
+**public string Left(string pString, int pHalfWidthLength)**  
+**public string LeftBySurrogate(string pString, int pHalfWidthLength)**  
+**public string LeftByVS(string pString, int pHalfWidthLength)**  
+
+文字列 pString から、文字数 pHalfWidthLength 以下になるように文字を取り出します。
+
+●**行分割**
+-----
+**public List<string> ToLine(string pString, int pHalfWidthLength)**  
+**public List<string> ToLineBySurrogate(string pString, int pHalfWidthLength)**  
+**public List<string> ToLineByVS(string pString, int pHalfWidthLength)**  
+
+文字列 pString を文字数 pHalfWidthLength を超えないように分割、配列化して返します。  
+
+●**文字付加**
+-----
+**public string PadLeft(string pString, int pHalfWidthLength, char pPaddingChar = ' ')**  
+**public string PadLeftBySurrogate(string pString, int pHalfWidthLength, char pPaddingChar = ' ')**  
+**public string PadLeftByVS(string pString, int pHalfWidthLength, char pPaddingChar = ' ')**  
+
+**public string PadRight(string pString, int pHalfWidthLength, char pPaddingChar = ' ')**  
+**public string PadRightBySurrogate(string pString, int pHalfWidthLength, char pPaddingChar = ' ')**  
+**public string PadRightByVS(string pString, int pHalfWidthLength, char pPaddingChar = ' ')**  
+
+文字列の左もしくは右へ、文字数が pHalfWidthLength になるように文字 pPaddingChar を追加します。  
+pPaddingCharには半角文字を指定します。  
+
+●**BOM判別**
+-----
+**static public BOMType GetBOMType(byte[] pDatas)**  
+
+BOMが格納されている pPatas を元にBOMを特定し、そのエンコード・タイプを返します。  
+pDatasには(ファイルなどの先頭から)4バイト以上のデータが格納されていること。  
+4バイト未満ではBOMの判別に失敗する可能性があります。  
+BOMが存在しない場合は Unknown が返ります。  
+
+|BOMType||
+----|----
+|Unknown|不明|
+|UTF8|UTF-8|
+|UTF16BE|UTF-16BE|
+|UTF16LE|UTF-16LE|
+|UTF32BE|UTF-32BE|
+|UTF32LE|UTF-32LE|
+
+●**全コードポイント作成**
+-----
+**DEBUGモード時のみ使用可能**  
+**static public IEnumerable<int> GetUnicodePoints(int pStart = UNICODE_LOW, int pEnd = UNICODE_HIGH, bool pUseSurrogate = false)**  
+
+
+U+0000～10FFFFまでの有効なコードポイント(UTF-32)を返します。  
+pUseSurrogate が true の場合はサロゲート用のコードポイント(0xD800～DFFF)も返します。  

@@ -1747,9 +1747,9 @@ namespace CSLibrary
 		/// <remarks>
 		/// pHalfWidthLengthで指定された長さになるように文字列の先頭に文字を追加する。
 		/// </remarks>
-		public string PadLeft(string pString, int pLength, char pPaddingChar = ' ')
+		public string PadLeft(string pString, int pHalfWidthLength, char pPaddingChar = ' ')
 		{
-			int pad = pLength - this.GetHalfWidthLength(pString);
+			int pad = pHalfWidthLength - this.GetHalfWidthLength(pString);
 			if (pad <= 0) {
 				return pString;
 			}
@@ -1766,9 +1766,9 @@ namespace CSLibrary
 		/// <remarks>
 		/// pHalfWidthLengthで指定された長さになるように文字列の末尾に文字を追加する。
 		/// </remarks>
-		public string PadRight(string pString, int pLength, char pPaddingChar = ' ')
+		public string PadRight(string pString, int pHalfWidthLength, char pPaddingChar = ' ')
 		{
-			int pad = pLength - this.GetHalfWidthLength(pString);
+			int pad = pHalfWidthLength - this.GetHalfWidthLength(pString);
 			if (pad <= 0) {
 				return pString;
 			}
@@ -1786,9 +1786,9 @@ namespace CSLibrary
 		/// pHalfWidthLengthで指定された長さになるように文字列の先頭に文字を追加する。
 		/// 文字長の判定はサロゲートペアを考慮する。
 		/// </remarks>
-		public string PadLeftBySurrogate(string pString, int pLength, char pPaddingChar = ' ')
+		public string PadLeftBySurrogate(string pString, int pHalfWidthLength, char pPaddingChar = ' ')
 		{
-			int pad = pLength - this.GetHalfWidthLengthBySurrogate(pString);
+			int pad = pHalfWidthLength - this.GetHalfWidthLengthBySurrogate(pString);
 			if (pad <= 0) {
 				return pString;
 			}
@@ -1806,9 +1806,9 @@ namespace CSLibrary
 		/// pHalfWidthLengthで指定された長さになるように文字列の末尾に文字を追加する。
 		/// 文字長の判定はサロゲートペアを考慮する。
 		/// </remarks>
-		public string PadRightBySurrogate(string pString, int pLength, char pPaddingChar = ' ')
+		public string PadRightBySurrogate(string pString, int pHalfWidthLength, char pPaddingChar = ' ')
 		{
-			int pad = pLength - this.GetHalfWidthLengthBySurrogate(pString);
+			int pad = pHalfWidthLength - this.GetHalfWidthLengthBySurrogate(pString);
 			if (pad <= 0) {
 				return pString;
 			}
@@ -1826,9 +1826,9 @@ namespace CSLibrary
 		/// pHalfWidthLengthで指定された長さになるように文字列の先頭に文字を追加する。
 		/// 文字長の判定はサロゲートペアとVSを考慮する。
 		/// </remarks>
-		public string PadLeftByVS(string pString, int pLength, char pPaddingChar = ' ')
+		public string PadLeftByVS(string pString, int pHalfWidthLength, char pPaddingChar = ' ')
 		{
-			int pad = pLength - this.GetHalfWidthLengthByVS(pString);
+			int pad = pHalfWidthLength - this.GetHalfWidthLengthByVS(pString);
 			if (pad <= 0) {
 				return pString;
 			}
@@ -1846,9 +1846,9 @@ namespace CSLibrary
 		/// pHalfWidthLengthで指定された長さになるように文字列の末尾に文字を追加する。
 		/// 文字長の判定はサロゲートペアとVSを考慮する。
 		/// </remarks>
-		public string PadRightByVS(string pString, int pLength, char pPaddingChar = ' ')
+		public string PadRightByVS(string pString, int pHalfWidthLength, char pPaddingChar = ' ')
 		{
-			int pad = pLength - this.GetHalfWidthLengthByVS(pString);
+			int pad = pHalfWidthLength - this.GetHalfWidthLengthByVS(pString);
 			if (pad <= 0) {
 				return pString;
 			}
@@ -1915,7 +1915,7 @@ namespace CSLibrary
 		/// </summary>
 		/// <param name="pStart">開始コード</param>
 		/// <param name="pEnd">終了コード</param>
-		/// <param name="useSurrogate">true=サロゲートペアで使用するコードも含める</param>
+		/// <param name="pUseSurrogate">true=サロゲートペアで使用するコードも含める</param>
 		/// <returns>指定範囲のコードポイント(UTF-32)</returns>
 		/// <remarks>
 		/// 指定範囲のコードポイントを生成して順次返却する。
@@ -1923,7 +1923,7 @@ namespace CSLibrary
 		/// 非文字は出力されない。
 		/// サロゲートペア用コードを含まなければ、合計111万個強を返す。
 		/// </remarks>
-		static public IEnumerable<int> GetUnicodePoints(int pStart = UNICODE_LOW, int pEnd = UNICODE_HIGH, bool useSurrogate = false)
+		static public IEnumerable<int> GetUnicodePoints(int pStart = UNICODE_LOW, int pEnd = UNICODE_HIGH, bool pUseSurrogate = false)
 		{
 			if ((pStart < UNICODE_LOW) ||
 				(pStart > UNICODE_HIGH)) {
@@ -1938,7 +1938,7 @@ namespace CSLibrary
 			}
 
 			for (int c = pStart; c <= pEnd; c++) {
-				if (useSurrogate == false) {
+				if (pUseSurrogate == false) {
 					if (UnicodeUtility.IsSurrogate(c)) {
 						continue;
 					}
