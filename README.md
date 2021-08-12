@@ -2,13 +2,6 @@
 
 ## 想定言語・バージョン
 C#/.net framework 4.5.2  
-***
-## [●ExDrawString](/doc/ExDrawString.md)
-(注意)作成中  
-縦書き・横書き対応の拡張DrawStringクラス。  
-矩形内に収まるようにフォントサイズを縮小したり、均等割り付けが可能になる予定。  
-尚、.net(Windows)の仕様によりIVS付きの文字は正しく描画出来ない。  
-※IVSが□で描画されてしまう  
 ****
 ## [●UnicodeUtilities](/doc/UnicodeUtilities.md)
 Unicode文字を扱う上での各種便利関数を集めたクラス。  
@@ -31,7 +24,6 @@ using(WaitCursor waitCursor = new WaitCursor()){
 	処理();
 }
 ```
-
 ___
 ## [●SharedData](/doc/SharedData.md)
 共有データ、いわゆるグローバルデータを管理するクラス。  
@@ -54,6 +46,13 @@ buffer.Capacity=10;		// バッファ数を10に拡張。Count以上であれば�
 buffer.WriteRange(new int[5] { 0, 1, 2, 3, 4 });// datacount=5,remain=5
 
 ```
+***
+## [●ExDrawString](/doc/ExDrawString.md)
+(注意)作成中  
+縦書き・横書き対応の拡張DrawStringクラス。  
+矩形内に収まるようにフォントサイズを縮小したり、均等割り付けが可能になる予定。  
+尚、.net(Windows)の仕様によりIVS付きの文字は正しく描画出来ない。  
+※IVSが□で描画されてしまう  
 ___
 ## ライセンス
 ライセンスを適用するファイルにはライセンスについての記述があります。   
