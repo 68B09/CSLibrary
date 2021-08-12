@@ -3,14 +3,14 @@
 ## 想定言語・バージョン
 C#/.net framework 4.5.2  
 ***
-## ●ExDrawString
+## [●ExDrawString](/doc/ExDrawString.md)
 (注意)作成中  
 縦書き・横書き対応の拡張DrawStringクラス。  
 矩形内に収まるようにフォントサイズを縮小したり、均等割り付けが可能になる予定。  
 尚、.net(Windows)の仕様によりIVS付きの文字は正しく描画出来ない。  
 ※IVSが□で描画されてしまう  
 ****
-## ●[UnicodeUtilities](/doc/UnicodeUtilities.md)
+## [●UnicodeUtilities](/doc/UnicodeUtilities.md)
 Unicode文字を扱う上での各種便利関数を集めたクラス。  
 ・半角全角判定  
 ・半角全角変換  
@@ -20,11 +20,11 @@ Unicode文字を扱う上での各種便利関数を集めたクラス。
 ・１文字に分解  
 etc..  
 ___
-## ●CSVAssistant
+## [●CSVAssistant](/doc/CSVAssistant.md)
 CSVファイルを読み書きするためのクラス。  
 フィールド単位で""で囲まれていたか否か判別可能。  
 ___
-## ●WaitCursor
+## [●WaitCursor](/doc/WaitCursor.md)
 時間がかかる処理をusingで囲み、処理が終わるまでマウスカーソルを「ウェイトカーソル」にするクラス。  
 ```
 using(WaitCursor waitCursor = new WaitCursor()){
@@ -33,11 +33,11 @@ using(WaitCursor waitCursor = new WaitCursor()){
 ```
 
 ___
-## ●SharedData
+## [●SharedData](/doc/SharedData.md)
 共有データ、いわゆるグローバルデータを管理するクラス。  
 本クラスを用いなくともstaticメンバを持っているクラスを作れば済むといえばそれまでですが…  
 ___
-## ●RingBuffer
+## [●RingBuffer](/doc/RingBuffer.md)
 リングバッファ  
 ```
 RingBuffer<int> buffer = new RingBuffer<int>(5); // buffer size = 5

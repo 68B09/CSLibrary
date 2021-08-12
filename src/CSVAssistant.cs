@@ -359,9 +359,12 @@ namespace CSLibrary
 			this.WriteFieldSeparator(pStream);
 
 			bool hasQuote = pText.IndexOf(this.quote) != -1;
+			bool hasCRLF = (pText.IndexOf('\r') != -1) || (pText.IndexOf('\n') != -1);
 
 			if (this.anytimeQuote == false) {
-				if ((hasQuote == false) && (pText.IndexOf(this.fieldSeparator) == -1)) {
+				if ((hasQuote == false) &&
+					(hasCRLF == false) &&
+					(pText.IndexOf(this.fieldSeparator) == -1)) {
 					pStream.Write(pText);
 					return;
 				}
