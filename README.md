@@ -61,7 +61,7 @@ Copyright (c) 2021 68B09
 ___
 ## 履歴
 2021/8/2 68B09  
-CSVAssistant.cs、WaitCursor.cs、SharedData、RingBuffer.csを追加。  
+CSVAssistant.cs、WaitCursor.cs、SharedData.cs、RingBuffer.csを追加。  
 
 2021/7/22 68B09  
 First release.

@@ -185,5 +185,26 @@ namespace CSLibrary
 			return newObject;
 		}
 		#endregion
+
+		#region SetObject
+		/// <summary>
+		/// オブジェクト登録
+		/// </summary>
+		/// <param name="pObject">登録したいオブジェクト</param>
+		static public void SetObject(object pObject)
+		{
+			Type objType = pObject.GetType();
+			typeObjects[objType] = pObject;
+		}
+		/// <summary>
+		/// オブジェクト登録(名前指定)
+		/// </summary>
+		/// <param name="pKey">オブジェクトの名前</param>
+		/// <param name="pObject">登録したいオブジェクト</param>
+		static public void SetObject(string pKey, object pObject)
+		{
+			typeObjects[pKey] = pObject;
+		}
+		#endregion
 	}
 }
