@@ -48,10 +48,9 @@ buffer.WriteRange(new int[5] { 0, 1, 2, 3, 4 });// datacount=5,remain=5
 ```
 ***
 ## [●ExDrawString](/doc/ExDrawString.md)
-(注意)作成中  
 縦書き・横書き対応の拡張DrawStringクラス。  
-矩形内に収まるようにフォントサイズを縮小したり、均等割り付けが可能になる予定。  
-尚、.net(Windows)の仕様によりIVS付きの文字は正しく描画出来ない。  
+矩形内に収まるようにフォントサイズを縮小したり、均等割り付けで描画出来ます。  
+尚、.net(Windows)の仕様によりIVSなどの文字は正しく描画出来ません。  
 ※IVSが□で描画されてしまう  
 ___
 ## ライセンス
