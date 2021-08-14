@@ -25,25 +25,24 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using CSLibrary;
 
 namespace CSLibrary
 {
+	#region ExDrawString
 	/// <summary>
-	/// 拡張DrawString
+	/// 拡張DrawStringクラス
 	/// </summary>
 	public class ExDrawString
 	{
-		#region デバッグ用
-#if DEBUG
-		private Pen penWhite = new Pen(Color.White);
-		private Pen penRed = new Pen(Color.Red);
-		private Pen penGreen = new Pen(Color.Green);
-		private Brush brushBlack = new SolidBrush(Color.Black);
-#endif
-		#endregion
-
 		#region 固定値
+		/// <summary>
+		/// 最小フォントサイズ(単位:ポイント)
+		/// </summary>
+		private readonly float minFontPointSize = 0.35f;
+
+		/// <summary>
+		/// 書式フラグ
+		/// </summary>
 		[Flags]
 		public enum FormatFlags : uint
 		{
@@ -63,7 +62,7 @@ namespace CSLibrary
 		/// <summary>
 		/// フォントサイズを小さくしていくときの縮小値
 		/// </summary>
-		private const float fontSizeDecrementStepPt = (float)((72 / 25.4) * 0.5);   // 0.5mm≒1.41732pt
+		private const float fontSizeDecrementStepPt = (float)((72 / 25.4) * 0.35);   // 0.35mm≒1pt
 		#endregion
 
 		#region フィールド・プロパティー
@@ -98,10 +97,11 @@ namespace CSLibrary
 		/// <param name="pY">Y座標(横書き時=左上、縦書き時=右上)</param>
 		/// <param name="pWidth">幅</param>
 		/// <param name="pHeight">高さ</param>
-		public void Draw(string pText, Graphics pGraphics, int pX, int pY, int pWidth, int pHeight)
+		/// <returns>true=描画を行った</returns>
+		public bool Draw(string pText, Graphics pGraphics, int pX, int pY, int pWidth, int pHeight)
 		{
 			Rectangle rect = new Rectangle(pX, pY, pWidth, pHeight);
-			this.Draw(pText, pGraphics, rect);
+			return this.Draw(pText, pGraphics, rect);
 		}
 
 		/// <summary>
@@ -110,13 +110,14 @@ namespace CSLibrary
 		/// <param name="pText">文字列</param>
 		/// <param name="pGraphics">Graphics</param>
 		/// <param name="pRect">領域</param>
+		/// <returns>true=描画を行った</returns>
 		/// <remarks>
 		/// フォント、ブラシ、フラグは本メソッドを呼出す前に設定すること。
 		/// FormatFlags.HRightは、FormatFlags.Verticalが指定されているときは"Left"の意味になる。
 		/// (注意)合成用濁音・半濁音付き全角平仮名および片仮名は合成されて描画される。
 		/// (注意)IVSはサポートされず、化けて表示される。
 		/// </remarks>
-		public void Draw(string pText, Graphics pGraphics, Rectangle pRect)
+		public bool Draw(string pText, Graphics pGraphics, Rectangle pRect)
 		{
 			float x = pRect.Left;
 			float y = pRect.Top;
@@ -124,6 +125,9 @@ namespace CSLibrary
 			GraphicsState saveGraphics = pGraphics.Save();
 			try {
 				LineDataCollection list = this.CreateDrawData(pText, pGraphics, this.Font, pRect.Width, pRect.Height, this.FormatFlag);
+				if (list == null) {
+					return false;
+				}
 				using (list.Font) {
 					foreach (LineData line in list) {
 						foreach (CharData chars in line.CharDataCollection) {
@@ -133,6 +137,7 @@ namespace CSLibrary
 						}
 					}
 				}
+				return true;
 			} finally {
 				pGraphics.Restore(saveGraphics);
 			}
@@ -147,20 +152,21 @@ namespace CSLibrary
 		/// <param name="pWidth">出力先幅</param>
 		/// <param name="pHeight">出力先高さ</param>
 		/// <param name="pFlags">書式フラグ</param>
-		/// <param name="pMinimumFontPointSize">フォントサイズ最小値(≧0.5)</param>
-		/// <returns>描画データ</returns>
+		/// <param name="pMinimumFontPointSize">フォントサイズ最小値(単位:ポイント)</param>
+		/// <returns>null=描画出来ない。null!=描画データ</returns>
 		private LineDataCollection CreateDrawData(string pText, Graphics pGraphics, Font pFont, int pWidth, int pHeight, FormatFlags pFlags, float pMinimumFontPointSize = 0.5f)
 		{
-			if (pMinimumFontPointSize < 0.5f) {
-				throw new ArgumentOutOfRangeException(nameof(pMinimumFontPointSize), pMinimumFontPointSize, "<0.5f");
+			if (pMinimumFontPointSize < this.minFontPointSize) {
+				throw new ArgumentOutOfRangeException(nameof(pMinimumFontPointSize), pMinimumFontPointSize, "<" + this.minFontPointSize);
 			}
 
 			LineDataCollection list;
 			Font font = new Font(pFont, pFont.Style);
+			bool blError = false;
 
 			// 段階的にフォントをサイズを小さくし、指定領域に収まるようになるまで繰り返す。
 			while (true) {
-				list = CreateCharData(pText, pGraphics, font, pWidth, pHeight, pFlags);
+				list = this.CreateCharData(pText, pGraphics, font, pWidth, pHeight, pFlags);
 
 				float nextFontSize = font.SizeInPoints - fontSizeDecrementStepPt;
 				bool blDecide = false;
@@ -177,11 +183,16 @@ namespace CSLibrary
 						blDecide = true;
 						break;
 					}
-					if (nextFontSize <= 0.5f) {
-						blDecide = true;
+					if (nextFontSize <= 0.1f) {
+						blError = true;
 						break;
 					}
 				} while (false);
+
+				if (blError) {
+					font.Dispose();
+					return null;
+				}
 
 				if (blDecide) {
 					list.Font = font;
@@ -392,7 +403,7 @@ namespace CSLibrary
 						continue;
 					}
 
-					// 文字情報を入れるオブジェクトを作成
+					// 文字データを入れるオブジェクトを作成
 					CharData charData = new CharData();
 					charData.Text = c;                      // 文字
 					charData.Size = strSize;                // 文字のサイズを設定
@@ -435,7 +446,7 @@ namespace CSLibrary
 						continue;
 					}
 
-					// 文字情報を入れるオブジェクトを作成
+					// 文字データを入れるオブジェクトを作成
 					CharData charData = new CharData();
 					charData.Text = c;                      // 文字
 					charData.Size = strSize;                // 文字のサイズを設定
@@ -479,12 +490,37 @@ namespace CSLibrary
 		/// </summary>
 		internal class LineDataCollection : List<LineData>
 		{
+			#region フィールド・プロパティー
+			/// <summary>
+			/// 縦書きフラグ
+			/// </summary>
 			public bool Vertical { get; set; }
-			public float Width { get; set; }
-			public float Height { get; set; }
-			public Font Font { get; set; }
-			public StringFormat StringFormat { get; set; }
 
+			/// <summary>
+			/// 全体の幅
+			/// </summary>
+			public float Width { get; set; }
+
+			/// <summary>
+			/// 全体の高さ
+			/// </summary>
+			public float Height { get; set; }
+
+			/// <summary>
+			/// フォント
+			/// </summary>
+			public Font Font { get; set; }
+
+			/// <summary>
+			/// StringFormat
+			/// </summary>
+			public StringFormat StringFormat { get; set; }
+			#endregion
+
+			/// <summary>
+			/// サイズ設定
+			/// </summary>
+			/// <param name="pBaseSize">サイズ</param>
 			public void SetWH(SizeF pBaseSize)
 			{
 				this.Width = 0;
@@ -515,6 +551,11 @@ namespace CSLibrary
 				}
 			}
 
+			/// <summary>
+			/// 座標オフセット加算
+			/// </summary>
+			/// <param name="pOffsetX">X方向オフセット</param>
+			/// <param name="pOffsetY">Y方向オフセット</param>
 			public void AddOffset(float pOffsetX, float pOffsetY)
 			{
 				foreach (LineData line in this) {
@@ -522,6 +563,11 @@ namespace CSLibrary
 				}
 			}
 
+			/// <summary>
+			/// 座標を最大値へ丸める
+			/// </summary>
+			/// <param name="pMaxX">最大X値</param>
+			/// <param name="pMaxY">最大Y値</param>
 			public void AdjustMaximum(float pMaxX, float pMaxY)
 			{
 				foreach (LineData line in this) {
@@ -529,6 +575,11 @@ namespace CSLibrary
 				}
 			}
 
+			/// <summary>
+			/// 座標を最小値へ丸める
+			/// </summary>
+			/// <param name="pMinX">最小X値</param>
+			/// <param name="pMinY">最小Y値</param>
 			public void AdjustMinimum(float pMinX, float pMinY)
 			{
 				foreach (LineData line in this) {
@@ -537,9 +588,21 @@ namespace CSLibrary
 			}
 		}
 
+		#region LineData
+		/// <summary>
+		/// 行データクラス
+		/// </summary>
 		internal class LineData
 		{
+			#region フィールド･プロパティー
+			/// <summary>
+			/// 文字データコレクション
+			/// </summary>
 			public CharDataCollection CharDataCollection { get; private set; }
+
+			/// <summary>
+			/// 文字数取得
+			/// </summary>
 			public int Count
 			{
 				get
@@ -547,6 +610,12 @@ namespace CSLibrary
 					return this.CharDataCollection.Count;
 				}
 			}
+
+			/// <summary>
+			/// 文字取得
+			/// </summary>
+			/// <param name="pIndex"></param>
+			/// <returns></returns>
 			public CharData this[int pIndex]
 			{
 				get
@@ -555,24 +624,52 @@ namespace CSLibrary
 				}
 			}
 
+			/// <summary>
+			/// 縦書きフラグ
+			/// </summary>
 			public bool Vertical { get; set; }
-			public float Width { get; set; }
-			public float Height { get; set; }
-			public float BaseX { get; set; }
-			public float BaseY { get; set; }
 
+			/// <summary>
+			/// 幅
+			/// </summary>
+			public float Width { get; set; }
+
+			/// <summary>
+			/// 高さ
+			/// </summary>
+			public float Height { get; set; }
+
+			/// <summary>
+			/// 基準X座標
+			/// </summary>
+			public float BaseX { get; set; }
+
+			//基準Y座標
+			public float BaseY { get; set; }
+			#endregion
+
+			#region コンストラクタ
 			public LineData(float pBaseX, float pBaseY)
 			{
 				this.CharDataCollection = new CharDataCollection();
 				this.BaseX = pBaseX;
 				this.BaseY = pBaseY;
 			}
+			#endregion
 
+			/// <summary>
+			/// 文字追加
+			/// </summary>
+			/// <param name="pData">文字データ</param>
 			public void Add(CharData pData)
 			{
 				this.CharDataCollection.Add(pData);
 			}
 
+			/// <summary>
+			/// サイズ設定
+			/// </summary>
+			/// <param name="pBaseSize">サイズ</param>
 			public void SetWH(SizeF pBaseSize)
 			{
 				if (this.Vertical == false) {
@@ -596,6 +693,11 @@ namespace CSLibrary
 				}
 			}
 
+			/// <summary>
+			/// 座標オフセット加算
+			/// </summary>
+			/// <param name="pOffsetX">X方向オフセット</param>
+			/// <param name="pOffsetY">Y方向オフセット</param>
 			public void AddOffset(float pOffsetX, float pOffsetY)
 			{
 				foreach (CharData c in this.CharDataCollection) {
@@ -603,6 +705,11 @@ namespace CSLibrary
 				}
 			}
 
+			/// <summary>
+			/// 座標を最大値へ丸める
+			/// </summary>
+			/// <param name="pMaxX">最大X値</param>
+			/// <param name="pMaxY">最大Y値</param>
 			public void AdjustMaximum(float pMaxX, float pMaxY)
 			{
 				foreach (CharData c in this.CharDataCollection) {
@@ -610,6 +717,11 @@ namespace CSLibrary
 				}
 			}
 
+			/// <summary>
+			/// 座標を最小値へ丸める
+			/// </summary>
+			/// <param name="pMinX">最小X値</param>
+			/// <param name="pMinY">最小Y値</param>
 			public void AdjustMinimum(float pMinX, float pMinY)
 			{
 				foreach (CharData c in this.CharDataCollection) {
@@ -617,16 +729,37 @@ namespace CSLibrary
 				}
 			}
 		}
+		#endregion
 
+		#region CharDataCollection
+		/// <summary>
+		/// 文字データコレクションクラス
+		/// </summary>
 		internal class CharDataCollection : List<CharData>
 		{
 		}
+		#endregion
 
+		#region CharData
+		/// <summary>
+		/// 文字データクラス
+		/// </summary>
 		internal class CharData
 		{
+			#region フィールド･プロパティー
+			/// <summary>
+			/// 文字列
+			/// </summary>
 			public string Text { get; set; }
 
+			/// <summary>
+			/// 幅
+			/// </summary>
 			private float width = 0;
+
+			/// <summary>
+			/// 幅取得･設定
+			/// </summary>
 			public float Width
 			{
 				get
@@ -638,7 +771,15 @@ namespace CSLibrary
 					this.width = value;
 				}
 			}
+
+			/// <summary>
+			/// 高さ
+			/// </summary>
 			private float height = 0;
+
+			/// <summary>
+			/// 高さ取得･設定
+			/// </summary>
 			public float Height
 			{
 				get
@@ -650,6 +791,10 @@ namespace CSLibrary
 					this.height = value;
 				}
 			}
+
+			/// <summary>
+			/// サイズ取得･設定
+			/// </summary>
 			public SizeF Size
 			{
 				get
@@ -663,7 +808,14 @@ namespace CSLibrary
 				}
 			}
 
+			/// <summary>
+			/// X座標
+			/// </summary>
 			private float x = 0;
+
+			/// <summary>
+			/// X座標取得･設定
+			/// </summary>
 			public float X
 			{
 				get
@@ -676,7 +828,14 @@ namespace CSLibrary
 				}
 			}
 
+			/// <summary>
+			/// Y座標
+			/// </summary>
 			private float y = 0;
+
+			/// <summary>
+			/// Y座標取得･設定
+			/// </summary>
 			public float Y
 			{
 				get
@@ -688,18 +847,31 @@ namespace CSLibrary
 					this.y = value;
 				}
 			}
+			#endregion
 
+			#region コンストラクタ
 			public CharData()
 			{
 				this.Text = "";
 			}
+			#endregion
 
+			/// <summary>
+			/// 座標オフセット加算
+			/// </summary>
+			/// <param name="pOffsetX">X方向オフセット</param>
+			/// <param name="pOffsetY">Y方向オフセット</param>
 			public void AddOffset(float pOffsetX, float pOffsetY)
 			{
 				this.x += pOffsetX;
 				this.y += pOffsetY;
 			}
 
+			/// <summary>
+			/// 座標を最大値へ丸める
+			/// </summary>
+			/// <param name="pMaxX">最大X値</param>
+			/// <param name="pMaxY">最大Y値</param>
 			public void AdjustMaximum(float pMaxX, float pMaxY)
 			{
 				if (this.x > pMaxX) {
@@ -709,6 +881,12 @@ namespace CSLibrary
 					this.y = pMaxY;
 				}
 			}
+
+			/// <summary>
+			/// 座標を最小値へ丸める
+			/// </summary>
+			/// <param name="pMinX">最小X値</param>
+			/// <param name="pMinY">最小Y値</param>
 			public void AdjustMinimum(float pMinX, float pMinY)
 			{
 				if (this.x < pMinX) {
@@ -719,5 +897,7 @@ namespace CSLibrary
 				}
 			}
 		}
+		#endregion
 	}
+	#endregion
 }
