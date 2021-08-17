@@ -49,3 +49,4 @@ CSVAssistant.cs、WaitCursor.cs、SharedData.cs、RingBuffer.csを追加。
 
 2021/7/22 68B09  
 First release.
+
