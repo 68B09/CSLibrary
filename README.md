@@ -38,12 +38,18 @@ ___
 尚、.net(Windows)の仕様によりIVSなどの文字は正しく描画出来ません。  
 ※IVSが□で描画されてしまう  
 ___
+## [●CSGeometries](/doc/CSGeometries.md)
+各種幾何計算メソッドを持つクラス。  
+___
 ## ライセンス
 ライセンスを適用するファイルにはライセンスについての記述があります。   
 The MIT License (MIT)  
 Copyright (c) 2021 68B09  
 ___
 ## 履歴
+2021/8/21 68B09  
+CSGeometriesを追加。  
+
 2021/8/2 68B09  
 CSVAssistant.cs、WaitCursor.cs、SharedData.cs、RingBuffer.csを追加。  
 
