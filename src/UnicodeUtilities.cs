@@ -824,6 +824,41 @@ namespace CSLibrary
 				yield return before.Value;
 			}
 		}
+
+		/// <summary>
+		/// 文字列をコードポイント文字列リストに変換
+		/// </summary>
+		/// <param name="pString">変換文字列</param>
+		/// <param name="pSurrogatePair">true=サロゲートぺア用のコードに変換する</param>
+		/// <param name="pSurrogatePairCombine">(pSurrogatePair==true時)、true=サロゲートぺアは"XXXX+XXXX"のように結合する</param>
+		/// <returns>コードポイント文字列リスト</returns>
+		static public List<string> MakeCodePointString(string pString, bool pSurrogatePair = false, bool pSurrogatePairCombine = false)
+		{
+			List<string> list = new List<string>(pString.Length);
+
+			foreach (int code in ConvertToUtf32(pString)) {
+				if ((code <= 0xffff) || (pSurrogatePair == false)) {
+					list.Add(code.ToString("X4"));
+					continue;
+				}
+
+				string strwk = char.ConvertFromUtf32(code);
+				for (int i = 0; i < strwk.Length; i++) {
+					string hex = ((int)strwk[i]).ToString("X4");
+					if (pSurrogatePairCombine) {
+						if (i == 0) {
+							list.Add(hex);
+						} else {
+							list[list.Count - 1] += "+" + hex;
+						}
+					} else {
+						list.Add(hex);
+					}
+				}
+			}
+
+			return list;
+		}
 		#endregion
 
 		#region 全角平仮名片仮名判定

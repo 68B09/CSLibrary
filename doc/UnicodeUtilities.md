@@ -148,6 +148,9 @@ ConvertToUtf32() の動作は CharacterEnumeratorBySurrogate() と同じで、1�
 
 無印(By無し)のメソッドが存在しないのは、単に `foreach(char c in "ABC"){～}` と書けば良いからです。
 
+**List<string> MakeCodePointString(string pString, bool pSurrogatePair = false, bool pSurrogatePairCombine = false)**  
+最小4桁のコードポイント16進数文字列を作ります。  
+
 ●**半角文字を全角文字に変換**
 ------
 **public string ConvertHalfToFullWidthNumber(string pString)** '0'~'9'(U+30～U+39)のみを変換  
