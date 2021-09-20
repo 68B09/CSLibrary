@@ -1943,6 +1943,47 @@ namespace CSLibrary
 		}
 		#endregion
 
+		#region 丸数字
+		/// <summary>
+		/// 丸数字判定
+		/// </summary>
+		/// <param name="pChar">判定文字</param>
+		/// <returns>pCharが⓪～㊿であればtrueを返す</returns>
+		static public bool IsMaruSuuji(char pChar)
+		{
+			if ((pChar == '⓪') ||
+				((pChar >= '①') && (pChar <= '⑳')) ||
+				((pChar >= '㉑') && (pChar <= '㉟')) ||
+				((pChar >= '㊱') && (pChar <= '㊿'))) {
+				return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// 丸数字文字取得
+		/// </summary>
+		/// <param name="pNumber">番号 0～50</param>
+		/// <returns>0=範囲外、0以外=丸数字</returns>
+		static public char GetMaruSuuji(int pNumber)
+		{
+			if (pNumber == 0) {
+				return '⓪';
+			}
+			if ((pNumber >= 1) && (pNumber <= 20)) {
+				return (char)('①' + (pNumber - 1));
+			}
+			if ((pNumber >= 21) && (pNumber <= 35)) {
+				return (char)('㉑' + (pNumber - 21));
+			}
+			if ((pNumber >= 36) && (pNumber <= 50)) {
+				return (char)('㊱' + (pNumber - 36));
+			}
+
+			return (char)0;
+		}
+		#endregion
+
 #if DEBUG
 		#region コードポイント作成
 		/// <summary>

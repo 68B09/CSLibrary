@@ -221,6 +221,20 @@ BOMが存在しない場合は Unknown が返ります。
 |UTF32BE|UTF-32BE|
 |UTF32LE|UTF-32LE|
 
+●**丸数字**
+-----
+**static public bool IsMaruSuuji(char pChar)**  
+**static public char GetMaruSuuji(int pNumber)**
+
+IsMaruSuujiは指定された文字が⓪～㊿であればtrueを返します。  
+GetMaruSuujiはpNumberに対応した丸数字を⓪～㊿を返します。  
+
+    UnicodeUtility.IsMaruSuuji('A');    // false
+    UnicodeUtility.IsMaruSuuji('㉑');   // true
+
+    UnicodeUtility.GetMaruSuuji(1);   // ①
+    UnicodeUtility.GetMaruSuuji(50);  // ㊿
+
 ●**全コードポイント作成**
 -----
 **DEBUGモード時のみ使用可能**  
