@@ -1479,7 +1479,7 @@ namespace CSLibrary
 		/// 半角文字数以下で文字列をカット
 		/// </summary>
 		/// <param name="pString">切り出し元文字列</param>
-		/// <param name="pHalfWidthLength">最大半角文字数(2以上)</param>
+		/// <param name="pHalfWidthLength">最大半角文字数</param>
 		/// <returns>切り出した文字列</returns>
 		/// <remarks>
 		/// pHalfWidthLength以下になるように文字列を切り出す。
@@ -1487,30 +1487,18 @@ namespace CSLibrary
 		/// </remarks>
 		public string Left(string pString, int pHalfWidthLength)
 		{
-			if (pHalfWidthLength < 2) {
-				throw new ArgumentOutOfRangeException(nameof(pHalfWidthLength), pHalfWidthLength, "<2");
-			}
-
 			int totalLength = 0;
 			StringBuilder sb = new StringBuilder(pString.Length);
 
 			foreach (char c in pString) {
-				if (totalLength >= pHalfWidthLength) {
+				int appendLength = this.IsHankaku(c) ? 1 : 2;
+
+				if ((totalLength + appendLength) > pHalfWidthLength) {
 					break;
 				}
 
-				if (this.IsHankaku(c)) {
-					// HalfWidth
-					sb.Append(c);
-					totalLength++;
-				} else {
-					// FullWidth
-					if ((totalLength + 2) > pHalfWidthLength) {
-						break;
-					}
-					sb.Append(c);
-					totalLength += 2;
-				}
+				totalLength += appendLength;
+				sb.Append(c);
 			}
 
 			return sb.ToString();
@@ -1520,7 +1508,7 @@ namespace CSLibrary
 		/// 半角文字数以下で文字列をカット(サロゲートペアを考慮)
 		/// </summary>
 		/// <param name="pString">切り出し元文字列</param>
-		/// <param name="pHalfWidthLength">最大半角文字数(2以上)</param>
+		/// <param name="pHalfWidthLength">最大半角文字数</param>
 		/// <returns>切り出した文字列</returns>
 		/// <remarks>
 		/// pHalfWidthLength以下になるように文字列を切り出す。
@@ -1528,30 +1516,18 @@ namespace CSLibrary
 		/// </remarks>
 		public string LeftBySurrogate(string pString, int pHalfWidthLength)
 		{
-			if (pHalfWidthLength < 2) {
-				throw new ArgumentOutOfRangeException(nameof(pHalfWidthLength), pHalfWidthLength, "<2");
-			}
-
 			int totalLength = 0;
 			StringBuilder sb = new StringBuilder(pString.Length);
 
 			foreach (string oneChar in CharacterEnumeratorBySurrogate(pString)) {
-				if (totalLength >= pHalfWidthLength) {
+				int appendLength = this.IsHankaku(oneChar) ? 1 : 2;
+
+				if ((totalLength + appendLength) > pHalfWidthLength) {
 					break;
 				}
 
-				if (this.IsHankaku(oneChar)) {
-					// HalfWidth
-					sb.Append(oneChar);
-					totalLength++;
-				} else {
-					// FullWidth
-					if ((totalLength + 2) > pHalfWidthLength) {
-						break;
-					}
-					sb.Append(oneChar);
-					totalLength += 2;
-				}
+				totalLength += appendLength;
+				sb.Append(oneChar);
 			}
 
 			return sb.ToString();
@@ -1561,7 +1537,7 @@ namespace CSLibrary
 		/// 半角文字数以下で文字列をカット(サロゲートペアやVSを考慮)
 		/// </summary>
 		/// <param name="pString">切り出し元文字列</param>
-		/// <param name="pHalfWidthLength">最大半角文字数(2以上)</param>
+		/// <param name="pHalfWidthLength">最大半角文字数</param>
 		/// <returns>切り出した文字列</returns>
 		/// <remarks>
 		/// pHalfWidthLength以下になるように文字列を切り出す。
@@ -1570,33 +1546,52 @@ namespace CSLibrary
 		/// </remarks>
 		public string LeftByVS(string pString, int pHalfWidthLength)
 		{
-			if (pHalfWidthLength < 2) {
-				throw new ArgumentOutOfRangeException(nameof(pHalfWidthLength), pHalfWidthLength, "<2");
-			}
-
 			int totalLength = 0;
 			StringBuilder sb = new StringBuilder(pString.Length);
 
 			foreach (string oneChar in CharacterEnumeratorByVS(pString)) {
-				if (totalLength >= pHalfWidthLength) {
+				int appendLength = this.IsHankaku(oneChar) ? 1 : 2;
+
+				if ((totalLength + appendLength) > pHalfWidthLength) {
 					break;
 				}
 
-				if (this.IsHankaku(oneChar)) {
-					// HalfWidth
-					sb.Append(oneChar);
-					totalLength++;
-				} else {
-					// FullWidth
-					if ((totalLength + 2) > pHalfWidthLength) {
-						break;
-					}
-					sb.Append(oneChar);
-					totalLength += 2;
-				}
+				totalLength += appendLength;
+				sb.Append(oneChar);
 			}
 
 			return sb.ToString();
+		}
+
+		/// <summary>
+		/// 半角文字数以下で文字列をカット(末尾基準)
+		/// </summary>
+		/// <param name="pString">切り出し元文字列</param>
+		/// <param name="pHalfWidthLength">最大半角文字数</param>
+		/// <returns>切り出した文字列</returns>
+		/// <remarks>
+		/// pHalfWidthLength以下になるように文字列を末尾方向から切り出す。
+		/// サロゲートペアや結合文字は分断されることがある。
+		/// </remarks>
+		public string Right(string pString, int pHalfWidthLength)
+		{
+			int totalLength = GetHalfWidthLength(pString);
+			if(totalLength <= pHalfWidthLength) {
+				return pString;
+			}
+
+			int substringStartPos = 0;
+
+			foreach (char c in pString) {
+				int charLength = this.IsHankaku(c) ? 1 : 2;
+				totalLength -= charLength;
+				substringStartPos++;
+				if(totalLength <= pHalfWidthLength) {
+					break;
+				}
+			}
+
+			return pString.Substring(substringStartPos);
 		}
 		#endregion
 
