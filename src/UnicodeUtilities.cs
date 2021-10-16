@@ -421,6 +421,62 @@ namespace CSLibrary
 			// サロゲートペアの文字は全角とみなす
 			return false;   // 全角
 		}
+
+		/// <summary>
+		/// 半角判定(文字位置)
+		/// </summary>
+		/// <param name="pString">判定する文字</param>
+		/// <param name="pIndex">判定する文字の位置</param>
+		/// <returns>true=半角、false=全角</returns>
+		/// <remarks>
+		/// 1Char単位で判定を行う。
+		/// サロゲートペアやIVSなどは考慮しない。
+		/// </remarks>
+		public bool IsHankaku(string pString, int pIndex)
+		{
+			// 文字列長が0の場合はエラー
+			if (pString.Length == 0) {
+				throw new ArgumentException("length is 0", nameof(pString));
+			}
+
+			return this.IsHankaku(pString[pIndex]);
+		}
+
+		/// <summary>
+		/// 半角判定(文字位置、サロゲートペアを考慮)
+		/// </summary>
+		/// <param name="pString">判定する文字</param>
+		/// <param name="pIndex">判定する文字の位置(0～)</param>
+		/// <param name="pIncrementSize">次の文字へのオフセット(1～)</param>
+		/// <returns>true=半角、false=全角</returns>
+		/// <remarks>
+		/// サロゲートペアを考慮して判定を行う。
+		/// IVSなどは考慮しない。
+		/// </remarks>
+		public bool IsHankakuSurrogate(string pString, int pIndex, out int pIncrementSize)
+		{
+			pIncrementSize = 1;
+
+			// 文字列長が0の場合はエラー
+			if (pString.Length == 0) {
+				throw new ArgumentException("length is 0", nameof(pString));
+			}
+
+			// Highサロゲートでなければ1charで判定
+			char c = pString[pIndex];
+			if (char.IsHighSurrogate(c) == false) {
+				return this.IsHankaku(c);
+			}
+
+			// Lowサロゲートが続いていれば2char進める
+			if ((pIndex + 1) < pString.Length) {
+				if (char.IsLowSurrogate(pString[pIndex + 1])) {
+					pIncrementSize = 2;
+				}
+			}
+
+			return false;   // 全角
+		}
 		#endregion
 
 		#region 外字判定
@@ -1576,7 +1632,7 @@ namespace CSLibrary
 		public string Right(string pString, int pHalfWidthLength)
 		{
 			int totalLength = GetHalfWidthLength(pString);
-			if(totalLength <= pHalfWidthLength) {
+			if (totalLength <= pHalfWidthLength) {
 				return pString;
 			}
 
@@ -1586,7 +1642,38 @@ namespace CSLibrary
 				int charLength = this.IsHankaku(c) ? 1 : 2;
 				totalLength -= charLength;
 				substringStartPos++;
-				if(totalLength <= pHalfWidthLength) {
+				if (totalLength <= pHalfWidthLength) {
+					break;
+				}
+			}
+
+			return pString.Substring(substringStartPos);
+		}
+
+		/// <summary>
+		/// 半角文字数以下で文字列をカット(末尾基準、サロゲートペアを考慮)
+		/// </summary>
+		/// <param name="pString">切り出し元文字列</param>
+		/// <param name="pHalfWidthLength">最大半角文字数</param>
+		/// <returns>切り出した文字列</returns>
+		/// <remarks>
+		/// pHalfWidthLength以下になるように文字列を末尾方向から切り出す。
+		/// サロゲートペアは破壊されないように考慮されるが、結合文字などは分断されることがある。
+		/// </remarks>
+		public string RightBySurrogate(string pString, int pHalfWidthLength)
+		{
+			int totalLength = GetHalfWidthLengthBySurrogate(pString);
+			if (totalLength <= pHalfWidthLength) {
+				return pString;
+			}
+
+			int substringStartPos = 0;
+			while (substringStartPos < pString.Length) {
+				int incrementSize;
+				int charLength = this.IsHankakuSurrogate(pString, substringStartPos, out incrementSize) ? 1 : 2;
+				totalLength -= charLength;
+				substringStartPos += incrementSize;
+				if (totalLength <= pHalfWidthLength) {
 					break;
 				}
 			}
