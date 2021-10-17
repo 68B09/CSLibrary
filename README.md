@@ -13,6 +13,11 @@ Unicode文字を扱う上での各種便利関数を集めたクラス。
 ・１文字に分解  
 etc..  
 ___
+## [●TextUtility](/doc/TextUtility.md)
+UnicodeUtilityに入れるほどでは無い文字処理を収めたクラス。  
+・ファイルパスの短縮  
+etc..  
+___
 ## [●CSVAssistant](/doc/CSVAssistant.md)
 CSVファイルを読み書きするためのクラス。  
 フィールド単位で""で囲まれていたか否か判別可能。  

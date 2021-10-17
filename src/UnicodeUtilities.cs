@@ -462,20 +462,13 @@ namespace CSLibrary
 				throw new ArgumentException("length is 0", nameof(pString));
 			}
 
-			// Highサロゲートでなければ1charで判定
-			char c = pString[pIndex];
-			if (char.IsHighSurrogate(c) == false) {
-				return this.IsHankaku(c);
+			// サロゲートぺアなら全角とみなす
+			if (char.IsSurrogatePair(pString, pIndex)) {
+				pIncrementSize = 2;
+				return false;
 			}
 
-			// Lowサロゲートが続いていれば2char進める
-			if ((pIndex + 1) < pString.Length) {
-				if (char.IsLowSurrogate(pString[pIndex + 1])) {
-					pIncrementSize = 2;
-				}
-			}
-
-			return false;   // 全角
+			return this.IsHankaku(pString[pIndex]);
 		}
 		#endregion
 
@@ -2186,6 +2179,217 @@ namespace CSLibrary
 		{
 			this.HalfWidth = pHalfWidth;
 			this.FullWidth = pFullWidth;
+		}
+	}
+	#endregion
+
+	#region CharacterInfomation
+	/// <summary>
+	/// 文字情報クラス
+	/// </summary>
+	/// <remarks>
+	/// 文字と文字に関する情報を扱う。
+	/// </remarks>
+	public class CharacterInfomation
+	{
+		#region フィールド・プロパティー
+		/// <summary>
+		/// 文字取得/設定
+		/// </summary>
+		public string Char { get; set; }
+
+		/// <summary>
+		/// 文字列長取得/設定
+		/// </summary>
+		/// <remarks>
+		/// 文字列長の単位は利用側に委ねられる。
+		/// </remarks>
+		public int Length { get; set; }
+		#endregion
+
+		#region コンストラクタ
+		/// <summary>
+		/// コンストラクタ
+		/// </summary>
+		public CharacterInfomation()
+		{
+			this.Char = "";
+			this.Length = 0;
+		}
+
+		/// <summary>
+		/// コンストラクタ(初期値)
+		/// </summary>
+		/// <param name="pChar">文字</param>
+		/// <param name="pLength">文字列長(単位は利用側に委ねる)</param>
+		public CharacterInfomation(string pChar, int pLength) : base()
+		{
+			this.Char = pChar;
+			this.Length = pLength;
+		}
+		#endregion
+	}
+	#endregion
+
+	#region CharacterInfoCollection
+	/// <summary>
+	/// 文字列情報コレクションクラス
+	/// </summary>
+	/// <remarks>
+	/// CharacterInfomationクラスのコレクションクラス。
+	/// 本クラスはCharacterInfomation.Lengthを半角文字を1、全角文字を2として扱う。
+	/// またサロゲートぺアを考慮する。
+	/// </remarks>
+	public class CharacterInfoCollection : List<CharacterInfomation>
+	{
+		#region フィールド・プロパティー
+		/// <summary>
+		/// UnicodeUtility取得/設定
+		/// </summary>
+		public UnicodeUtility UnicodeUtility { get; set; }
+
+		/// <summary>
+		/// 文字列長取得(半角単位)
+		/// </summary>
+		public int Length
+		{
+			get
+			{
+				int total = 0;
+				for (int i = 0; i < this.Count; i++) {
+					total += this[i].Length;
+				}
+				return total;
+			}
+		}
+		#endregion
+
+		#region コンストラクタ
+		/// <summary>
+		/// コンストラクタ
+		/// </summary>
+		public CharacterInfoCollection()
+		{
+			this.UnicodeUtility = new UnicodeUtility();
+		}
+		#endregion
+
+		/// <summary>
+		/// 1文字追加(char)
+		/// </summary>
+		/// <param name="pChar">文字</param>
+		public void Add(char pChar)
+		{
+			this.Add(pChar.ToString());
+		}
+
+		/// <summary>
+		/// 1文字追加(string)
+		/// </summary>
+		/// <param name="pChar">文字</param>
+		public void Add(string pChar)
+		{
+			this.Add(new CharacterInfomation(pChar,
+					 this.UnicodeUtility.GetHalfWidthLengthBySurrogate(pChar)));
+		}
+
+		/// <summary>
+		/// 文字追加(char、繰り返し)
+		/// </summary>
+		/// <param name="pChar">文字</param>
+		/// <param name="pRepeat">繰り返し回数</param>
+		/// <remarks>
+		/// 文字pCharをpRepeat数分追加する。
+		/// </remarks>
+		public void Add(char pChar, int pRepeat)
+		{
+			this.Add(pChar.ToString(), pRepeat);
+		}
+
+		/// <summary>
+		/// 文字追加(string、繰り返し)
+		/// </summary>
+		/// <param name="pChar">文字</param>
+		/// <param name="pRepeat">繰り返し回数</param>
+		/// <remarks>
+		/// 文字pCharをpRepeat数分追加する。
+		/// </remarks>
+		public void Add(string pChar, int pRepeat)
+		{
+			int halfLen = this.UnicodeUtility.GetHalfWidthLengthBySurrogate(pChar);
+			for (int i = 0; i < pRepeat; i++) {
+				this.Add(new CharacterInfomation(pChar, halfLen));
+			}
+		}
+
+		/// <summary>
+		/// 文字列左(先頭)から指定文字数削除
+		/// </summary>
+		/// <param name="pLength">削除文字長(半角単位)</param>
+		/// <returns>削除文字長(pLengthより大きいときがある)</returns>
+		/// <remarks>
+		/// pLengthが1であっても全角文字を削除した場合などは2が返る。
+		/// </remarks>
+		public int RemoveTop(int pLength)
+		{
+			int removedLength = 0;
+			while (this.Count > 0) {
+				if (pLength <= 0) {
+					break;
+				}
+				pLength -= this[0].Length;
+				removedLength += this[0].Length;
+				this.RemoveAt(0);
+			}
+			return removedLength;
+		}
+
+		/// <summary>
+		/// 文字列右(末尾)から指定文字数削除
+		/// </summary>
+		/// <param name="pLength">削除文字長(半角単位)</param>
+		/// <returns>削除文字長(pLengthより大きいときがある)</returns>
+		/// <remarks>
+		/// pLengthが1であっても全角文字を削除した場合などは2が返る。
+		/// </remarks>
+		public int RemoveLast(int pLength)
+		{
+			int removedLength = 0;
+			int index = this.Count - 1;
+			while (index >= 0) {
+				if (pLength <= 0) {
+					break;
+				}
+				pLength -= this[index].Length;
+				removedLength += this[index].Length;
+				this.RemoveAt(index);
+				index--;
+			}
+			return removedLength;
+		}
+
+		/// <summary>
+		/// StringBuilderへ文字を追加
+		/// </summary>
+		/// <param name="pStringBuilder">StringBuilder</param>
+		public void AppendTo(StringBuilder pStringBuilder)
+		{
+			for (int i = 0; i < this.Count; i++) {
+				pStringBuilder.Append(this[i].Char);
+			}
+		}
+
+		/// <summary>
+		/// 文字列化
+		/// </summary>
+		/// <returns>文字列</returns>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder(this.Count);
+			for (int i = 0; i < this.Count; i++) {
+				sb.Append(this[i].Char);
+			}
+			return sb.ToString();
 		}
 	}
 	#endregion
