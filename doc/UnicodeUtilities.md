@@ -180,7 +180,14 @@ ConvertToUtf32() の動作は CharacterEnumeratorBySurrogate() と同じで、1�
 **public string LeftBySurrogate(string pString, int pHalfWidthLength)**  
 **public string LeftByVS(string pString, int pHalfWidthLength)**  
 
-文字列 pString から、文字数 pHalfWidthLength 以下になるように文字を取り出します。
+文字列 pString の左端(先頭)から文字数 pHalfWidthLength 以下になるように文字列を取り出します。
+
+●**右端から文字列を取り出す**
+-----
+**public string Right(string pString, int pHalfWidthLength)**  
+**public string RightBySurrogate(string pString, int pHalfWidthLength)**  
+
+文字列 pString の右端(末尾)から文字数 pHalfWidthLength 以下になるように文字列を取り出します。
 
 ●**行分割**
 -----
@@ -243,3 +250,56 @@ GetMaruSuujiはpNumberに対応した丸数字を⓪～㊿を返します。
 
 U+0000～10FFFFまでの有効なコードポイント(UTF-32)を返します。  
 pUseSurrogate が true の場合はサロゲート用のコードポイント(0xD800～DFFF)も返します。  
+  
+  
+**CharacterInfomation**  
+==========
+CharacterInfomationは文字とその文字の長さをペアで管理するデータクラスです。  
+
+**CharacterInfoCollection**
+==========
+CharacterInfoCollectionはCharacterInfomationのコレクションクラスで、文字列を以下のように管理します。  
+|    |[0]|[1]|[2]|
+|----| ---- |---- |---- |
+|string Char|A|あ|𩸽|
+|int Length|1|2|2|
+
+●**文字列長取得**  
+-----
+半角文字単位の文字数(各Lengthの合計値)を返します。  
+見出しの例では 5 を返します。
+
+●**文字列追加**
+-----
+**public void Add(char pChar)**  
+**public void Add(string pChar)**  
+**public void Add(char pChar, int pRepeat)**  
+**public void Add(string pChar, int pRepeat)**  
+現在のコレクションに文字を追加します。  
+文字列はサロゲートぺアが考慮され、文字列の長さ(`CharacterInfomation.Length`)は`UnicodeUtility.GetHalfWidthLengthBySurrogate()`の値となります。  
+    
+    CharacterInfoCollection list = new CharacterInfoCollection();
+    list.clear();
+    list.Add("Aあ𩸽"); // 内部のデータは見出しの表(↑)と同じ結果になる
+
+●**削除、クリア**
+-----
+**public int RemoveTop(int pLength)**  
+**public int RemoveLast(int pLength)**  
+**public void Clear()**  
+指定された文字数分を削除します。  
+RemoveTop()は先頭から、RemoveLastは末尾から削除します。  
+
+●StringBuilderへ文字を追加
+-----
+**public void AppendTo(StringBuilder pStringBuilder)**  
+文字を StringBuilder へ追加します。  
+
+●**文字列化** 
+-----
+**public override string ToString()**  
+文字列化して返します。  
+
+●**その他**  
+-----
+List<T>を継承しているためList<T>のメソッドが使用出来ます。
