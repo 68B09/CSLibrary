@@ -46,12 +46,21 @@ ___
 ## [●CSGeometries](/doc/CSGeometries.md)
 各種幾何計算メソッドを持つクラス。  
 ___
+## [●ExFileStream](/doc/ExFileStream.md)
+FileStreamの拡張クラス。  
+___
+## [●ByteArrayUtility](/doc/ByteArrayUtility.md)
+byte[]を扱う各種処理を持つクラス。  
+___
 ## ライセンス
 ライセンスを適用するファイルにはライセンスについての記述があります。   
 The MIT License (MIT)  
 Copyright (c) 2021 68B09  
 ___
 ## 履歴
+2021/12/30 68B09  
+ExFileStreamおよびByteArrayUtilityを追加。  
+
 2021/8/21 68B09  
 CSGeometriesを追加。  
 
