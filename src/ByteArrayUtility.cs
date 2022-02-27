@@ -69,19 +69,36 @@ namespace CSLibrary
 		}
 
 		/// <summary>
+		/// メモリからBigEndian形式のUInt64読み出し
+		/// </summary>
+		/// <param name="pBuf">byte[]</param>
+		/// <param name="pIndex">読み出し開始位置</param>
+		/// <returns>UInt64</returns>
+		static public UInt64 GetUInt64BE(byte[] pBuf, int pIndex)
+		{
+			int index = pIndex;
+			UInt64 num = 0;
+			for (int i = 0; i < 8; i++) {
+				num = (num << 8) + pBuf[index++];
+			}
+			return num;
+		}
+
+
+		/// <summary>
 		/// メモリからBigEndian形式のUInt32読み出し
 		/// </summary>
 		/// <param name="pBuf">byte[]</param>
 		/// <param name="pIndex">読み出し開始位置</param>
 		/// <returns>UInt32</returns>
-		public UInt32 GetUInt32BE(byte[] pBuf, int pIndex)
+		static public UInt32 GetUInt32BE(byte[] pBuf, int pIndex)
 		{
-			int index = pIndex + 3;
-			reverseBuf[0] = pBuf[index--];
-			reverseBuf[1] = pBuf[index--];
-			reverseBuf[2] = pBuf[index--];
-			reverseBuf[3] = pBuf[index--];
-			return BitConverter.ToUInt32(this.reverseBuf, 0);
+			int index = pIndex;
+			UInt32 num = 0;
+			for (int i = 0; i < 8; i++) {
+				num = (num << 8) + pBuf[index++];
+			}
+			return num;
 		}
 
 		/// <summary>
@@ -90,12 +107,12 @@ namespace CSLibrary
 		/// <param name="pBuf">byte[]</param>
 		/// <param name="pIndex">読み出し開始位置</param>
 		/// <returns>UInt16</returns>
-		public UInt16 GetUInt16BE(byte[] pBuf, int pIndex)
+		static public UInt16 GetUInt16BE(byte[] pBuf, int pIndex)
 		{
-			int index = pIndex + 1;
-			reverseBuf[0] = pBuf[index--];
-			reverseBuf[1] = pBuf[index--];
-			return BitConverter.ToUInt16(this.reverseBuf, 0);
+			int index = pIndex;
+			int num = pBuf[index++];
+			num = (num << 8) + pBuf[index++];
+			return (UInt16)num;
 		}
 		#endregion
 	}

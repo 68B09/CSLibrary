@@ -146,7 +146,7 @@ namespace CSLibrary
 		public UInt32 GetUInt32BE()
 		{
 			this.Read(readBuf, 0, 4);
-			return this.byteUtil.GetUInt32BE(this.readBuf, 0);
+			return ByteArrayUtility.GetUInt32BE(this.readBuf, 0);
 		}
 
 		/// <summary>
@@ -156,7 +156,7 @@ namespace CSLibrary
 		public UInt16 GetUInt16BE()
 		{
 			this.Read(readBuf, 0, 2);
-			return this.byteUtil.GetUInt16BE(this.readBuf, 0);
+			return ByteArrayUtility.GetUInt16BE(this.readBuf, 0);
 		}
 		#endregion
 	}
