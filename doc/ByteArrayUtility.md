@@ -13,7 +13,8 @@ pLengthはバイト数です。
 
 ●**数値取得(BigEndian)**
 ------
+**UInt64 GetUInt64BE(byte[] pBuf, int pIndex)**  
 **UInt32 GetUInt32BE(byte[] pBuf, int pIndex)**  
 **UInt16 GetUInt16BE(byte[] pBuf, int pIndex)**  
 
-指定位置からBigEndian形式で数値を取り出します。  
+指定位置にBigEndian形式で格納されている数値を取り出します。  
