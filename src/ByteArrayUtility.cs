@@ -95,7 +95,7 @@ namespace CSLibrary
 		{
 			int index = pIndex;
 			UInt32 num = 0;
-			for (int i = 0; i < 8; i++) {
+			for (int i = 0; i < 4; i++) {
 				num = (num << 8) + pBuf[index++];
 			}
 			return num;
