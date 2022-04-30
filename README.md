@@ -58,6 +58,9 @@ The MIT License (MIT)
 Copyright (c) 2021 68B09  
 ___
 ## 履歴
+2022/4/30 68B09  
+CSGeometries.Unitsを追加。
+
 2021/12/30 68B09  
 ExFileStreamおよびByteArrayUtilityを追加。  
 
