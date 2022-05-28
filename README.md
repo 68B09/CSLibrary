@@ -52,12 +52,18 @@ ___
 ## [●ByteArrayUtility](/doc/ByteArrayUtility.md)
 byte[]を扱う各種処理を持つクラス。  
 ___
+## [●BCDUtility](/doc/BCDUtility.md)
+BCD(二進化十進法)を扱うクラス群。  
+___
 ## ライセンス
 ライセンスを適用するファイルにはライセンスについての記述があります。   
 The MIT License (MIT)  
-Copyright (c) 2021 68B09  
+Copyright (c) 2022 68B09  
 ___
 ## 履歴
+2022/5/28 68B09  
+BCDUtility.csを追加。
+
 2022/4/30 68B09  
 CSGeometries.Unitsを追加。
 
