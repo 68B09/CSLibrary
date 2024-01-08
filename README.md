@@ -64,6 +64,9 @@ The MIT License (MIT)
 Copyright (c) 2022 68B09  
 ___
 ## 履歴
+2024/1/8 68B09  
+CSLibraryConstants.cs,DPIUnit.csを追加。
+
 2022/5/28 68B09  
 BCDUtility.csを追加。
 
