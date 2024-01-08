@@ -17,7 +17,8 @@ https://github.com/68B09/CSGeometries をCSLibraryに移動させたものです
 SIなどの単位に関するクラス群です。  
 1. SIUnit … 10を底とするSI接頭辞(u,m,k,M,...)  
 1. BinUnit … 2を底とする2進接頭辞(Ki,Mi,Gi...)  
-  
+1. DPIUnit … DotPerInchを基準とした各種単位への変換  
+     
 double型の精度や演算誤差などにより必ずしも正確な変換が行えるとは限らないことに注意して下さい。  
 特に大きな単位や小さな単位では誤差が生じやすくなります。  
 
@@ -60,4 +61,14 @@ int beki = unit.GetBekisisu("k");
 BinUnit unit = new BinUnit();
 int beki = unit.GetBekisisu("Ki");
 // beki = 10
+```
+
+●**DPIUnit**  
+------
+DPIを基準として各種単位への変換を行います。  
+
+・ミリメートルをドット(ピクセル)数へ変換。  
+```
+DPIUnit dpiUnit = new DPIUnit(p_graphics.DpiX);
+float width = dpiUnit.MMToDot<float>(10);    // 10mmをドット数へ変換
 ```

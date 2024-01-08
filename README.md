@@ -3,6 +3,9 @@
 ## 想定言語・バージョン
 C#/.net framework 4.5.2  
 ****
+## [●CSLibraryConstants](/doc/CSLibraryConstants.md)
+CSLibrary全体で参照する定数などを集めたクラス。  
+___
 ## [●UnicodeUtilities](/doc/UnicodeUtilities.md)
 Unicode文字を扱う上での各種便利関数を集めたクラス。  
 ・半角全角判定  
