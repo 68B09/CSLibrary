@@ -10,21 +10,7 @@ https://github.com/68B09/CSGeometries をCSLibraryに移動させたものです
 
 動作に関してはソースファイルも参照して下さい。  
 
-------
-# CSGeometries.Units
-**概要**
-==========
-SIなどの単位に関するクラス群です。  
-1. SIUnit … 10を底とするSI接頭辞(u,m,k,M,...)  
-1. BinUnit … 2を底とする2進接頭辞(Ki,Mi,Gi...)  
-1. DPIUnit … DotPerInchを基準とした各種単位への変換  
-     
-double型の精度や演算誤差などにより必ずしも正確な変換が行えるとは限らないことに注意して下さい。  
-特に大きな単位や小さな単位では誤差が生じやすくなります。  
-
-動作に関してはソースファイルも参照して下さい。  
-
-●**距離**  
+●**線分長取得**  
 **public static double GetLength(PointD p1, PointD p2)**  
 二点間の距離を返します。  
 ![GetLine](image/GetLine.png)
@@ -41,17 +27,51 @@ double型の精度や演算誤差などにより必ずしも正確な変換が�
 
 ●**線交差判定**  
 **public static double IsCross(PointD pL1_1, PointD pL1_2, PointD pL2_1, PointD pL2_2)**  
-線1と線2が交差すれば**0以外**、しなければ**0**を返します。  
+線1(pL1)と線2(pL2)が交差すれば**0以外**、しなければ**0**を返します。  
 「線分」ではなく「直線」で判定するため、交点が線分上にない場合でも交差する場合は0以外を返します。  
 言い換えれば「二つの線が平行か？」を判定します。  
 ![IsCross.png](image/IsCross.png)  
 この図では線が交差するため0以外の値が返ります。  
 
+●**交点取得**  
+**public static PointD GetCrossPoint(PointD pL1_1, PointD pL1_2, PointD pL2_1, PointD pL2_2, out bool pIsCross)**  
+二つの直線の交点座標を返します。  
+交差する場合はpIsCrossにtrueが、しなかった場合はfalseが設定されます。  
+![GetCrossPoint.png](image/GetCrossPoint.png)  
+この図では点ansの座標が返り、pIsCrossにtrueが設定されます。  
+
+●**矩形内判定**  
+**public static bool InRect(PointD p1, PointD p2, PointD pPoint)**  
+対角線(p1-p2)で指定される矩形内に点(pPoint)が入っているかを判定し、入っていれば**true**、入っていなければ**false**を返します。  
+p1およびp2は対角線を表していれば良いので、必ずしもp1&lt;p2である必要はありません。  
+
+●**垂線交点取得**  
+**public static PointD GetPerpendicularlinePoint(PointD p1, PointD p2, PointD pPoint)**  
+点(pPoint)から線(p1-p2)に垂線を引いた時の交点を返します。  
+![GetPerpendicularlinePoint.png](image/GetPerpendicularlinePoint.png)  
+
+●**垂線長取得**  
+**public static double GetPerpendicularlineLength(PointD p1, PointD p2, PointD pPoint)**  
+点(pPoint)から線(p1-p2)に垂線を引いた時の垂線の長さを返します。  
+![GetPerpendicularlineLength.png](image/GetPerpendicularlineLength.png)  
 
 
 
 
 
+------
+# CSGeometries.Units
+**概要**
+==========
+SIなどの単位に関するクラス群です。  
+1. SIUnit … 10を底とするSI接頭辞(u,m,k,M,...)  
+1. BinUnit … 2を底とする2進接頭辞(Ki,Mi,Gi...)  
+1. DPIUnit … DotPerInchを基準とした各種単位への変換  
+     
+double型の精度や演算誤差などにより必ずしも正確な変換が行えるとは限らないことに注意して下さい。  
+特に大きな単位や小さな単位では誤差が生じやすくなります。  
+
+動作に関してはソースファイルも参照して下さい。  
 
 ●**単位変換(正規化)**
 ------
