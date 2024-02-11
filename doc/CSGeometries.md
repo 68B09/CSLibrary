@@ -47,7 +47,7 @@ p1およびp2は対角線を表していれば良いので、必ずしもp1&lt;p
 
 ●**垂線交点取得**  
 **public static PointD GetPerpendicularlinePoint(PointD p1, PointD p2, PointD pPoint)**  
-点(pPoint)から線(p1-p2)に垂線を引いた時の交点を返します。  
+点(pPoint)から線(p1-p2)に垂線を引いた時の交点座標を返します。  
 ![GetPerpendicularlinePoint.png](image/GetPerpendicularlinePoint.png)  
 
 ●**垂線長取得**  
@@ -55,9 +55,54 @@ p1およびp2は対角線を表していれば良いので、必ずしもp1&lt;p
 点(pPoint)から線(p1-p2)に垂線を引いた時の垂線の長さを返します。  
 ![GetPerpendicularlineLength.png](image/GetPerpendicularlineLength.png)  
 
+●**最小・最大座標整合**  
+**public static void MarshalMaxmin(ref PointD pMin, ref PointD pMax)**  
+二つの座標(pMin,pMax)を、pMinが左下、pMaxが右上になるように調整します。  
 
+●**折れ線がなす角度**  
+**public static bool GetAngle(PointD p1, PointD p2, PointD p3, out double pAngle)**  
+折れ線p1-p2-p3がなす角度(radian)をpAngleに設定します。  
+pAngleの値は0～πです。  
+角度が得られた場合はtrueを、線分の長さが0などで計算出来なかった場合はエラーとしてfalseを返します。  
+![GetAngle.png](image/GetAngle.png)  
 
+●**Radian→Degree**  
+**public static double RadianToDegree(double pAngle)**  
+ラジアン(pAngle)をディグリーに変換して返します。  
+(ex) RadianToDegree(Math.PI / 2) → 90  
 
+●**Degree→Radian**  
+**public static double DegreeToRadian(double pAngle)**  
+ディグリー(pAngle)をラジアンに変換して返します。  
+(ex) DegreeToRadian(180) → 3.141592…
+
+●**飽和丸め**  
+**public static double Saturation(double pValue, double pMin = 0.0, double pMax = 1.0)**  
+pValueの値が最小(pMin)から最大(pMax)の範囲に収まるように調整し、その値を返します。  
+(ex)Saturation(-1.0, 1.0, 10.0) → 1.0  
+(ex)Saturation(11.0, 1.0, 10.0) → 10.0  
+
+●**最大公約数取得**  
+**public static long GCD(long p1, long p2)**  
+p1とp2の最大公約数を返します。  
+p1もしくはp2が負の場合は例外をスローします。  
+p1もしくはp2のどちらかが0の場合は0を返します。  
+(ex)GCD(4, 6) → 2  
+(ex)GCD(127, 255) → 1  
+
+●**最小公倍数取得**  
+**public static long LCM(long p1, long p2)**  
+p1とp2の最小公倍数を返します。  
+p1もしくはp2が負の場合は例外をスローします。  
+p1もしくはp2のどちらかが0の場合は0を返します。  
+(ex)LCM(6, 10) → 30
+(ex)LCM(127, 255) → 32385
+
+●**素因数分解**  
+**public static System.Collections.Generic.List&lt;long&gt; PrimeFactorization(long pValue)**  
+pValueの素因数分解を行い因数のリストを返します。  
+pValueが1未満の場合は例外をスローします。  
+(ex)PrimeFactorization(3 * 4 * 5 * 7 * 11) → [2,2,3,5,7,11]  
 
 ------
 # CSGeometries.Units
