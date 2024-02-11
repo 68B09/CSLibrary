@@ -12,8 +12,12 @@ https://github.com/68B09/CSGeometries をCSLibraryに移動させたものです
 
 ●**線分長取得**  
 **public static double GetLength(PointD p1, PointD p2)**  
-二点間の距離を返します。  
+二点(p1-p2)間の距離を返します。  
 ![GetLine](image/GetLine.png)
+
+**public static double GetLength(double pX1, double pY1, double pX2, double pY2)**  
+二点間の距離を返します。  
+![GetLine2](image/GetLine2.png)
 
 ●**内積**  
 **public static double GetDot(PointD p1, PointD p2)**  
@@ -45,17 +49,31 @@ https://github.com/68B09/CSGeometries をCSLibraryに移動させたものです
 対角線(p1-p2)で指定される矩形内に点(pPoint)が入っているかを判定し、入っていれば**true**、入っていなければ**false**を返します。  
 p1およびp2は対角線を表していれば良いので、必ずしもp1&lt;p2である必要はありません。  
 
+●**矩形内判定(複数ポイント)**  
+**public static bool InRect(PointD p1, PointD p2, params PointD[] pPoints)**  
+対角線(p1-p2)で指定される矩形内に点群(pPoints)が全て入っているかを判定し、入っていれば**true**、入っていなければ**false**を返します。  
+p1およびp2は対角線を表していれば良いので、必ずしもp1&lt;p2である必要はありません。  
+
 ●**垂線交点取得**  
 **public static PointD GetPerpendicularlinePoint(PointD p1, PointD p2, PointD pPoint)**  
 点(pPoint)から線(p1-p2)に垂線を引いた時の交点座標を返します。  
 ![GetPerpendicularlinePoint.png](image/GetPerpendicularlinePoint.png)  
+
+●**垂線交点取得(線分上判定)**  
+**public static PointD? GetPerpendicularlinePointOnLine(PointD p1, PointD p2, PointD pPoint)**  
+GetPerpendicularlinePoint()と同じく垂線の交点を返しますが、交点がp1-p2上に無い場合はnullを返します。  
 
 ●**垂線長取得**  
 **public static double GetPerpendicularlineLength(PointD p1, PointD p2, PointD pPoint)**  
 点(pPoint)から線(p1-p2)に垂線を引いた時の垂線の長さを返します。  
 ![GetPerpendicularlineLength.png](image/GetPerpendicularlineLength.png)  
 
+●**垂線長取得(線分上判定)**  
+**public static double? GetPerpendicularlineLengthOnLine(PointD p1, PointD p2, PointD pPoint)**  
+GetPerpendicularlineLength()と同じく垂線の長さを返しますが、交点がp1-p2上に無い場合はnullを返します。  
+
 ●**最小・最大座標整合**  
+**public static void MarshalMaxmin(ref Point pMin, ref Point pMax)**  
 **public static void MarshalMaxmin(ref PointD pMin, ref PointD pMax)**  
 二つの座標(pMin,pMax)を、pMinが左下、pMaxが右上になるように調整します。  
 
@@ -65,6 +83,13 @@ p1およびp2は対角線を表していれば良いので、必ずしもp1&lt;p
 pAngleの値は0～πです。  
 角度が得られた場合はtrueを、線分の長さが0などで計算出来なかった場合はエラーとしてfalseを返します。  
 ![GetAngle.png](image/GetAngle.png)  
+
+●**最小最大座標取得**  
+**public static void GetMaxmin(PointD[] pPoints, out PointD pMin, out PointD pMax)**  
+座標列(pPoints)中の最小X,Y座標をpMinへ、最大X,Y座標をpMaxへ設定します。  
+つまり座標列が構成する矩形領域の左下座標と右上座標が設定されます。  
+pMinもしくはpMaxの点が座標列中に存在しない場合もあることに注意してください。  
+![GetMaxmin.png](image/GetMaxmin.png)  
 
 ●**Radian→Degree**  
 **public static double RadianToDegree(double pAngle)**  
@@ -76,11 +101,22 @@ pAngleの値は0～πです。
 ディグリー(pAngle)をラジアンに変換して返します。  
 (ex) DegreeToRadian(180) → 3.141592…
 
-●**飽和丸め**  
+<a name="Saturation"></a>●**飽和丸め**  
 **public static double Saturation(double pValue, double pMin = 0.0, double pMax = 1.0)**  
 pValueの値が最小(pMin)から最大(pMax)の範囲に収まるように調整し、その値を返します。  
 (ex)Saturation(-1.0, 1.0, 10.0) → 1.0  
 (ex)Saturation(11.0, 1.0, 10.0) → 10.0  
+
+●**範囲丸め**  
+**public static double GetInRange(double pValue, double pMin, double pMax)**  
+メソッド名が異なるだけで[`Saturation(pValue, pMin, pMax)`](#Saturation)と同じです。  
+
+●**対角座標から4点を作成**  
+**public static void Rect2PointTo4Point(Point p1, Point p2, System.Collections.Generic.IList&lt;Point&gt; pTable)**  
+対角座標(p1-p2)から四隅の座標を作成しそれを返します。  
+pTableの要素数は4以上確保してください。  
+本メソッド呼び出し後はpTable[0]には左下、[1]には右上座標が入ります。  
+また、座標は時計回り順で設定されます。  
 
 ●**最大公約数取得**  
 **public static long GCD(long p1, long p2)**  
