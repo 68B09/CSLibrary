@@ -22,7 +22,35 @@ double型の精度や演算誤差などにより必ずしも正確な変換が�
 特に大きな単位や小さな単位では誤差が生じやすくなります。  
 
 動作に関してはソースファイルも参照して下さい。  
-  
+
+●**距離**  
+**public static double GetLength(PointD p1, PointD p2)**  
+二点間の距離を返します。  
+![GetLine](image/GetLine.png)
+
+●**内積**  
+**public static double GetDot(PointD p1, PointD p2)**  
+内積(dot)を返します。  
+※ans.  p1･p2 = (p1.X ･ p2.X) + (p1.Y ･ p2.Y)  
+
+●**線に対する点の位置**  
+**public static double GetPointLR(PointD pStart, PointD pEnd, PointD pPoint)**  
+線(pStart→pEnd)に対して点(pPoint)が左右のどちらにあるのかを判定し、左にあれば**負**、右にあれば**正**、線上であれば**0**を返します。  
+![GetPointLR.png](image/GetPointLR.png)
+
+●**線交差判定**  
+**public static double IsCross(PointD pL1_1, PointD pL1_2, PointD pL2_1, PointD pL2_2)**  
+線1と線2が交差すれば**0以外**、しなければ**0**を返します。  
+「線分」ではなく「直線」で判定するため、交点が線分上にない場合でも交差する場合は0以外を返します。  
+言い換えれば「二つの線が平行か？」を判定します。  
+![IsCross.png](image/IsCross.png)  
+この図では線が交差するため0以外の値が返ります。  
+
+
+
+
+
+
 ●**単位変換(正規化)**
 ------
 **double Normalize(double pValue, out string pUnitName)**  
