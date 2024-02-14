@@ -1,4 +1,4 @@
-﻿# CSGeometries
+﻿# CSGeometries.Geometry
 **概要**
 ==========
 https://github.com/68B09/CSGeometries をCSLibraryに移動させたものです。  
