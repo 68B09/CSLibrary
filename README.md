@@ -58,7 +58,7 @@ ___
 ## [●BCDUtility](/doc/BCDUtility.md)
 BCD(二進化十進法)を扱うクラス群。  
 ___
-## [●BCDUtility](/doc/IPv4.md)
+## [●IPv4](/doc/IPv4.md)
 IPv4を扱うクラス群。  
 ___
 ## ライセンス
