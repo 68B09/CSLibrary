@@ -3,6 +3,9 @@
 ## 想定言語・バージョン
 C#/.net framework 4.5.2  
 ****
+## [●CSLibraryConstants](/doc/CSLibraryConstants.md)
+CSLibrary全体で参照する定数などを集めたクラス。  
+___
 ## [●UnicodeUtilities](/doc/UnicodeUtilities.md)
 Unicode文字を扱う上での各種便利関数を集めたクラス。  
 ・半角全角判定  
@@ -55,12 +58,21 @@ ___
 ## [●BCDUtility](/doc/BCDUtility.md)
 BCD(二進化十進法)を扱うクラス群。  
 ___
+## [●BCDUtility](/doc/IPv4.md)
+IPv4を扱うクラス群。  
+___
 ## ライセンス
 ライセンスを適用するファイルにはライセンスについての記述があります。   
 The MIT License (MIT)  
 Copyright (c) 2022 68B09  
 ___
 ## 履歴
+2024/7/4 68B09  
+IPv4.csを追加。
+
+2024/1/8 68B09  
+CSLibraryConstants.cs,DPIUnit.csを追加。
+
 2022/5/28 68B09  
 BCDUtility.csを追加。
 
