@@ -6,6 +6,7 @@ IPv4アドレスを範囲で扱う基本クラスです。
 ●**コンストラクタ**
 ------
 **public IPv4Range()**  
+**public IPv4Range(IPv4Range pSrc)**  
 **public IPv4Range(uint pMin, uint pMax)**  
 **public IPv4Range(string pCIDR)**  
 **public IPv4Range(string pIPv4From, string pIPv4To)**  
@@ -21,19 +22,28 @@ IPv4アドレスを範囲で扱う基本クラスです。
 アドレスの最小・最大値を取得するプロパティーです。  
 値の設定にはSetMinMax()を使用してください。  
 
+●**アドレス数取得**
+------
+**public long Count**  
+
+MinからMaxまでの個数を返します。  
+Minが0、Maxが1であれば2を返します。  
+
 ●**最小・最大値設定**
 ------
-**public void SetMinMax(uint pMin, uint pMax)**  
+**public void SetMinMax(uint pMin, uint pMax, bool blPower = false)**  
 
 アドレスの最小・最大値を設定するメソッドです。  
-pMin<=pMaxが守られていない場合は例外がスローされます。  
+blPowerがfalseの場合、pMin<=pMaxが守られていないと例外がスローされます。  
 
 ●**現在の範囲を表すCIDR表記文字列を生成**
 ------
-**public IList&lt;string&gt; ToCIDR()**  
+**public IList&lt;string&gt; ToCIDR(IList&lt;string&gt; pList = null)**  
 
-Min,Maxの範囲に対応するCIDR表記の文字列を生成して返します。  
+Min,Maxの範囲に対応するCIDR表記の文字列を格納したリストオブジェクトを返します。  
 範囲によっては2つ以上返す事があります。  
+pListがnullの場合は内部で生成したリストオブジェクトを返します。  
+null以外の場合はpListに格納され、戻り値にはpListが返されます。  
 
 ●**アドレス内包チェック**
 ------
@@ -42,9 +52,26 @@ Min,Maxの範囲に対応するCIDR表記の文字列を生成して返します
 
 指定されたアドレスが自身の範囲内であるかをチェックしその判定結果を返します。  
 
-●**ホスト部のマスクビットを作成**
+●**重なりフラグ**
 ------
-**static public uint MakeHostMask(int pBits)**  
+**public enum OverlapFlags : int**  
 
-pBitsで示されるビット長に対応するホスト部のマスク値を返します。  
-pBitsに24を指定すると255(0xFF)が返ります。  
+CheckOverlapメソッドが返すフラグです。  
+
+●**重なりチェック**
+------
+**public OverlapFlags CheckOverlap(IPv4Range pTarget)**  
+
+自身とpTargetが持つアドレスの重なり具合を返します。  
+
+●**マージ**
+------
+**static public List&lt;IPv4Range&gt;> Merge(IEnumerable&lt;IPv4Range&gt; pRangeDatas)**  
+
+結合可能なアドレス同士を結合し、マージ後のデータリストを返します。  
+pRangeDatas内のオブジェクトの内容は変更されません。  
+総当たりで処理を行うためデータ数によっては時間がかかります。  
+
+ ※[IPv4Range.Min,IPv4Range.Max]※  
+pRangeDatas[0,2],[8,9],[5,6],[3,4],[10,20]  
+return [8,9],[0,6],[10,20] ※ソートされません※  

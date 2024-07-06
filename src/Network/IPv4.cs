@@ -115,6 +115,69 @@ namespace CSLibrary.Network
 
 			return null;
 		}
+
+		/// <summary>
+		/// ホスト部のマスクビットを作成(ネットワーク部ビット数指定)
+		/// </summary>
+		/// <param name="pBits">マスクビット数</param>
+		/// <returns>ビットマスク</returns>
+		/// <remarks>
+		/// MakeHostMask(24) -> 255
+		/// </remarks>
+		static public uint MakeHostMask(int pBits)
+		{
+			if (pBits == 32) {
+				return 0;
+			}
+			return uint.MaxValue >> pBits;
+		}
+
+		/// <summary>
+		/// ネットワーク部のマスクビットを作成(ネットワーク部4バイト値指定)
+		/// </summary>
+		/// <param name="pMask">マスク(x.x.x.x)</param>
+		/// <returns>ビットマスク</returns>
+		/// <remarks>
+		/// MakeNetworkMask("255.255.255.0") -> 0xffffff00
+		/// </remarks>
+		static public uint MakeNetworkMask(string pMask)
+		{
+			string[] fields = pMask.Split('.');
+			if (fields.Length != 4) {
+				throw new ArgumentException();
+			}
+
+			Int64 mask = 0;
+			for (int i = 0; i < 4; i++) {
+				mask <<= 8;
+				switch (fields[i]) {
+					case "128":
+					case "192":
+					case "224":
+					case "240":
+					case "248":
+					case "252":
+					case "254":
+					case "255":
+						if (i != 0) {
+							if (fields[i - 1] != "255") {
+								throw new ArgumentException();
+							}
+						}
+
+						mask |= Int64.Parse(fields[i]);
+						break;
+
+					case "0":
+						break;
+
+					default:
+						throw new ArgumentException();
+				}
+			}
+
+			return (uint)mask;
+		}
 	}
 
 	/// <summary>
@@ -122,6 +185,7 @@ namespace CSLibrary.Network
 	/// </summary>
 	public class IPv4Range
 	{
+		#region フィールド・プロパティー
 		/// <summary>
 		/// アドレス最小値
 		/// </summary>
@@ -151,6 +215,19 @@ namespace CSLibrary.Network
 				return this.max;
 			}
 		}
+
+		/// <summary>
+		/// アドレス個数取得
+		/// </summary>
+		public long Count
+		{
+			get
+			{
+				return (long)this.max - (long)this.min + 1;
+			}
+		}
+		#endregion
+
 		#region コンストラクタ
 		/// <summary>
 		/// コンストラクタ
@@ -159,6 +236,16 @@ namespace CSLibrary.Network
 		{
 			this.min = 0;
 			this.max = 0;
+		}
+
+		/// <summary>
+		/// コピーコンストラクタ
+		/// </summary>
+		/// <param name="pSrc">コピー元</param>
+		public IPv4Range(IPv4Range pSrc)
+		{
+			this.min = pSrc.min;
+			this.max = pSrc.max;
 		}
 
 		/// <summary>
@@ -182,7 +269,7 @@ namespace CSLibrary.Network
 		/// <remarks>
 		/// new IPv4Range("198.51.100.0/24")
 		/// </remarks>
-		public IPv4Range(string pCIDR)
+		public IPv4Range(string pCIDR) : this()
 		{
 			Regex regex = new Regex(@"^(?<ADDR>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/(?<BITS>[0-9]+)$");
 			Match match = regex.Match(pCIDR);
@@ -193,7 +280,7 @@ namespace CSLibrary.Network
 				if ((bits < 0) || (bits > 32)) {
 					throw new ArgumentOutOfRangeException();
 				}
-				this.max = this.min | MakeHostMask(bits);
+				this.max = this.min | IPv4Base.MakeHostMask(bits);
 				return;
 			}
 
@@ -201,36 +288,7 @@ namespace CSLibrary.Network
 			match = regex.Match(pCIDR);
 			if (match.Success) {
 				this.min = IPv4Base.StringToUInt(match.Groups["ADDR"].Value);
-
-				string[] fields = match.Groups["MASK"].Value.Split('.');
-				Int64 mask = 0;
-				for (int i = 0; i < 4; i++) {
-					mask <<= 8;
-					switch (fields[i]) {
-						case "128":
-						case "192":
-						case "224":
-						case "240":
-						case "248":
-						case "252":
-						case "254":
-						case "255":
-							if (i != 0) {
-								if (fields[i - 1] != "255") {
-									throw new ArgumentOutOfRangeException();
-								}
-							}
-
-							mask |= Int64.Parse(fields[i]);
-							break;
-
-						case "0":
-							break;
-
-						default:
-							throw new ArgumentOutOfRangeException();
-					}
-				}
+				Int64 mask = IPv4Base.MakeNetworkMask(match.Groups["MASK"].Value);
 				this.max = this.min | ~((uint)mask);
 				return;
 			}
@@ -245,7 +303,7 @@ namespace CSLibrary.Network
 		/// <remarks>
 		/// new IPv4Range("198.51.100.0", "198.51.100.255")
 		/// </remarks>
-		public IPv4Range(string pIPv4From, string pIPv4To)
+		public IPv4Range(string pIPv4From, string pIPv4To) : this()
 		{
 			this.min = IPv4Base.StringToUInt(pIPv4From);
 			this.max = IPv4Base.StringToUInt(pIPv4To);
@@ -262,7 +320,7 @@ namespace CSLibrary.Network
 		/// <remarks>
 		/// new IPv4Range("198.51.100.0", 256)
 		/// </remarks>
-		public IPv4Range(string pIPv4, int pCount)
+		public IPv4Range(string pIPv4, int pCount) : this()
 		{
 			this.min = IPv4Base.StringToUInt(pIPv4);
 
@@ -287,10 +345,13 @@ namespace CSLibrary.Network
 		/// </summary>
 		/// <param name="pMin">最小値</param>
 		/// <param name="pMax">最大値</param>
-		public void SetMinMax(uint pMin, uint pMax)
+		/// <param name="blPower">true=値のチェックを行わない。</param>
+		public void SetMinMax(uint pMin, uint pMax, bool blPower = false)
 		{
-			if (pMin > pMax) {
-				throw new ArgumentOutOfRangeException();
+			if (!blPower) {
+				if (pMin > pMax) {
+					throw new ArgumentOutOfRangeException();
+				}
 			}
 			this.min = pMin;
 			this.max = pMax;
@@ -299,21 +360,31 @@ namespace CSLibrary.Network
 		/// <summary>
 		/// 現在の範囲を表すCIDR表記文字列を生成
 		/// </summary>
+		/// <param name="pList">CIDRを追加する配列</param>
 		/// <returns>CIDR表記文字列リスト</returns>
 		/// <remarks>
 		/// 複数の文字列が返されることがあります。
+		/// pListにnullを指定した場合は内部で生成したリストオブジェクトを返します。
 		/// </remarks>
-		public IList<string> ToCIDR()
+		public IList<string> ToCIDR(IList<string> pList = null)
 		{
-			List<string> result = new List<string>();
-			uint start = this.min;
-			uint end = this.max;
+			IList<string> result;
+			if (pList == null) {
+				result = new List<string>();
+			} else {
+				result = pList;
+				result.Clear();
+			}
+
+			long start = this.min;
+			long end = this.max;
+			double log2 = Math.Log(2);
 
 			while (end >= start) {
-				byte maxSize = 32;
+				int maxSize = 32;
 				while (maxSize > 0) {
-					uint mask = ~MakeHostMask(maxSize - 1);
-					uint maskedBase = start & mask;
+					long mask = ~IPv4Base.MakeHostMask(maxSize - 1);
+					long maskedBase = start & mask;
 
 					if (maskedBase != start) {
 						break;
@@ -322,13 +393,13 @@ namespace CSLibrary.Network
 					maxSize--;
 				}
 
-				double maxDiff = Math.Log(end - start + 1) / Math.Log(2);
-				byte maxDiffSize = (byte)(32 - Math.Floor(maxDiff));
+				int maxDiff = (int)(Math.Log(end - start + 1) / log2);
+				int maxDiffSize = (32 - maxDiff);
 				if (maxSize < maxDiffSize) {
 					maxSize = maxDiffSize;
 				}
 
-				result.Add($"{IPv4Base.UIntToString(start)}/{maxSize}");
+				result.Add($"{IPv4Base.UIntToString((uint)start)}/{maxSize}");
 				start += (uint)Math.Pow(2, (32 - maxSize));
 			}
 
@@ -359,19 +430,130 @@ namespace CSLibrary.Network
 		}
 
 		/// <summary>
-		/// ホスト部のマスクビットを作成
+		/// 重なりフラグ
 		/// </summary>
-		/// <param name="pBits">マスクビット数</param>
-		/// <returns>ビットマスク</returns>
-		/// <remarks>
-		/// MakeHostMask(24) -> 255
-		/// </remarks>
-		static public uint MakeHostMask(int pBits)
+		public enum OverlapFlags : int
 		{
-			if (pBits == 32) {
-				return 0;
+			Min = -2,   // 重ならず相手が小さい
+			Max = -1,   // 重ならず相手が大きい
+			Equal = 0,  // 完全一致(どちらかを削除できる)
+			Inside,     // 内側に入る(相手を削除できる)
+			Surrounded, // 自分を囲う(自身を削除できる)
+			CrossMin,   // 小さい方に重なる(小さい方へ拡張できる)
+			CrossMax,   // 大きい方に重なる(大きい方へ拡張できる)
+			ContactMin, // 小さい方に接触している(小さい方へ拡張できる)
+			ContactMax, // 大きい方に接触している(大きい方へ拡張できる)
+		}
+
+		/// <summary>
+		/// 重なりチェック
+		/// </summary>
+		/// <param name="pTarget">チェック相手</param>
+		/// <returns>OverlapFlags</returns>
+		/// <remarks>
+		/// 自身と相手のアドレス範囲の重なり具合を返します。
+		/// </remarks>
+		public OverlapFlags CheckOverlap(IPv4Range pTarget)
+		{
+			// 小さい方に重なる？
+			if (((long)pTarget.max + 1) == (long)this.min) {
+				return OverlapFlags.ContactMin;
 			}
-			return uint.MaxValue >> pBits;
+
+			// 大きい方に重なる？
+			if (((long)this.max + 1) == (long)pTarget.min) {
+				return OverlapFlags.ContactMax;
+			}
+
+			// 重ならず相手が小さい？
+			if (pTarget.max < this.min) {
+				return OverlapFlags.Min;
+			}
+
+			// 重ならず相手が大きい？
+			if (this.max < pTarget.min) {
+				return OverlapFlags.Max;
+			}
+
+			// 完全一致？
+			if ((this.min == pTarget.min) && (this.max == pTarget.max)) {
+				return OverlapFlags.Equal;
+			}
+
+			// 内側に入る？
+			if (this.InRange(pTarget)) {
+				return OverlapFlags.Inside;
+			}
+
+			// 自分を囲う？
+			if ((this.min >= pTarget.min) && (this.max <= pTarget.max)) {
+				return OverlapFlags.Surrounded;
+			}
+
+			// 小さい方に重なる(小さい方を拡張できる)？
+			if (this.InRange(pTarget.min)) {
+				return OverlapFlags.CrossMin;
+			}
+
+			// 大きい方に重なる(大きい方を拡張できる)？
+			if (this.InRange(pTarget.max)) {
+				return OverlapFlags.CrossMax;
+			}
+
+			throw new InvalidProgramException();
+		}
+
+		/// <summary>
+		/// アドレスマージ
+		/// </summary>
+		/// <param name="pRangeDatas">マージデータリスト</param>
+		/// <returns>マージ後データリスト</returns>
+		/// <remarks>
+		/// 結合可能なアドレス同士を結合し、マージ後のデータリストを返します。
+		/// pRangeDatas内のオブジェクトの内容は変更されません。
+		/// </remarks>
+		static public List<IPv4Range> Merge(IEnumerable<IPv4Range> pRangeDatas)
+		{
+			List<IPv4Range> result = new List<IPv4Range>();
+			foreach (IPv4Range srcRange in pRangeDatas) {
+				result.Add(new IPv4Range(srcRange));
+			}
+
+			// 結合相手が無くなるまで相手を探して結合する
+			while (result.Count >= 2) {
+				bool blProcessed = false;
+				for (int i = 0; i < result.Count - 1; i++) {
+					for (int j = i + 1; j < result.Count; j++) {
+						OverlapFlags flag = result[i].CheckOverlap(result[j]);
+						if (flag < 0) {
+							continue;
+						} else if ((flag == OverlapFlags.Equal) || (flag == OverlapFlags.Inside)) {
+							result.RemoveAt(j);
+							blProcessed = true;
+							j--;
+						} else if (flag == OverlapFlags.Surrounded) {
+							result.RemoveAt(i);
+							blProcessed = true;
+						} else if ((flag == OverlapFlags.CrossMin) || (flag == OverlapFlags.ContactMin)) {
+							result[i].min = result[j].min;
+							result.RemoveAt(j);
+							blProcessed = true;
+							j--;
+						} else if ((flag == OverlapFlags.CrossMax) || (flag == OverlapFlags.ContactMax)) {
+							result[i].max = result[j].max;
+							result.RemoveAt(j);
+							blProcessed = true;
+							j--;
+						}
+					}
+				}
+
+				if (!blProcessed) {
+					break;
+				}
+			}
+
+			return result;
 		}
 
 		/// <summary>

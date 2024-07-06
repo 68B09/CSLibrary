@@ -28,3 +28,16 @@ IPv4アドレスを扱う基本クラスです。
 "198.51.100.0-198.51.100.1" IPv4Range  
 "198.51.100.0/255.255.255.0" IPv4Range  
 
+●**ホスト部のマスクビットを作成**
+------
+**static public uint MakeHostMask(int pBits)**  
+
+pBitsで示されるビット長に対応するホスト部のマスク値を返します。  
+pBitsに24を指定すると255(0xFF)が返ります。  
+
+●**ネットワーク部のマスクビットを作成**
+------
+**static public uint MakeNetworkMask(string pMask)**  
+
+pMaskで示されるマスク値に対応するネットワーク部のマスク値を返します。  
+pMaskに"255.255.255.0"を指定すると0xFFFFFF00が返ります。  
