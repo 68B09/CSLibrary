@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
+using static CSLibrary.Network.IPv4Range;
 
 namespace CSLibrary.Network
 {
@@ -187,6 +188,16 @@ namespace CSLibrary.Network
 	{
 		#region フィールド・プロパティー
 		/// <summary>
+		/// 正規表現－CIDR表記
+		/// </summary>
+		static public readonly Regex regexCIDR = new Regex(@"^(?<ADDR>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/(?<BITS>[0-9]+)$");
+
+		/// <summary>
+		/// 正規表現－マスク表現
+		/// </summary>
+		static public readonly Regex regexMask = new Regex(@"^(?<ADDR>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/(?<MASK>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$");
+
+		/// <summary>
 		/// アドレス最小値
 		/// </summary>
 		private uint min;
@@ -271,8 +282,7 @@ namespace CSLibrary.Network
 		/// </remarks>
 		public IPv4Range(string pCIDR) : this()
 		{
-			Regex regex = new Regex(@"^(?<ADDR>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/(?<BITS>[0-9]+)$");
-			Match match = regex.Match(pCIDR);
+			Match match = regexCIDR.Match(pCIDR);
 			if (match.Success) {
 				this.min = IPv4Base.StringToUInt(match.Groups["ADDR"].Value);
 
@@ -284,8 +294,7 @@ namespace CSLibrary.Network
 				return;
 			}
 
-			regex = new Regex(@"^(?<ADDR>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/(?<MASK>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$");
-			match = regex.Match(pCIDR);
+			match = regexMask.Match(pCIDR);
 			if (match.Success) {
 				this.min = IPv4Base.StringToUInt(match.Groups["ADDR"].Value);
 				Int64 mask = IPv4Base.MakeNetworkMask(match.Groups["MASK"].Value);
@@ -400,7 +409,7 @@ namespace CSLibrary.Network
 				}
 
 				result.Add($"{IPv4Base.UIntToString((uint)start)}/{maxSize}");
-				start += (uint)Math.Pow(2, (32 - maxSize));
+				start += (long)Math.Pow(2, (32 - maxSize));
 			}
 
 			return result;
@@ -504,59 +513,6 @@ namespace CSLibrary.Network
 		}
 
 		/// <summary>
-		/// アドレスマージ
-		/// </summary>
-		/// <param name="pRangeDatas">マージデータリスト</param>
-		/// <returns>マージ後データリスト</returns>
-		/// <remarks>
-		/// 結合可能なアドレス同士を結合し、マージ後のデータリストを返します。
-		/// pRangeDatas内のオブジェクトの内容は変更されません。
-		/// </remarks>
-		static public List<IPv4Range> Merge(IEnumerable<IPv4Range> pRangeDatas)
-		{
-			List<IPv4Range> result = new List<IPv4Range>();
-			foreach (IPv4Range srcRange in pRangeDatas) {
-				result.Add(new IPv4Range(srcRange));
-			}
-
-			// 結合相手が無くなるまで相手を探して結合する
-			while (result.Count >= 2) {
-				bool blProcessed = false;
-				for (int i = 0; i < result.Count - 1; i++) {
-					for (int j = i + 1; j < result.Count; j++) {
-						OverlapFlags flag = result[i].CheckOverlap(result[j]);
-						if (flag < 0) {
-							continue;
-						} else if ((flag == OverlapFlags.Equal) || (flag == OverlapFlags.Inside)) {
-							result.RemoveAt(j);
-							blProcessed = true;
-							j--;
-						} else if (flag == OverlapFlags.Surrounded) {
-							result.RemoveAt(i);
-							blProcessed = true;
-						} else if ((flag == OverlapFlags.CrossMin) || (flag == OverlapFlags.ContactMin)) {
-							result[i].min = result[j].min;
-							result.RemoveAt(j);
-							blProcessed = true;
-							j--;
-						} else if ((flag == OverlapFlags.CrossMax) || (flag == OverlapFlags.ContactMax)) {
-							result[i].max = result[j].max;
-							result.RemoveAt(j);
-							blProcessed = true;
-							j--;
-						}
-					}
-				}
-
-				if (!blProcessed) {
-					break;
-				}
-			}
-
-			return result;
-		}
-
-		/// <summary>
 		/// ハッシュ作成
 		/// </summary>
 		/// <returns>ハッシュ値</returns>
@@ -592,6 +548,93 @@ namespace CSLibrary.Network
 		public override string ToString()
 		{
 			return IPv4Base.UIntToString(this.min) + "-" + IPv4Base.UIntToString(this.max);
+		}
+	}
+
+	/// <summary>
+	/// IPv4Rangeのコレクションクラス
+	/// </summary>
+	public class IPv4RangeCollection : List<IPv4Range>
+	{
+		/// <summary>
+		/// ソート
+		/// </summary>
+		/// <remarks>
+		/// 最小アドレス(Min)をキーに昇順ソートを行います。
+		/// </remarks>
+		public void SortByMinimumAddress()
+		{
+			this.Sort((x, y) => x.Min.CompareTo(y.Min));
+		}
+
+		/// <summary>
+		/// アドレスマージ
+		/// </summary>
+		/// <returns>マージ後データリスト</returns>
+		/// <remarks>
+		/// 結合可能なアドレス同士を結合し、マージ後のデータリストを返します。
+		/// 自身のオブジェクトの内容は変更されません。
+		/// マージ後のデータリストは必要であればソートを行ってください。
+		/// </remarks>
+		public IPv4RangeCollection Merge()
+		{
+			return Merge(this);
+		}
+
+		/// <summary>
+		/// アドレスマージ
+		/// </summary>
+		/// <param name="pRangeDatas">マージデータリスト</param>
+		/// <returns>マージ後データリスト</returns>
+		/// <seealso cref="Merge"/>
+		/// <remarks>
+		/// 結合可能なアドレス同士を結合し、マージ後のデータリストを返します。
+		/// pRangeDatas内のオブジェクトの内容は変更されません。
+		/// </remarks>
+		static public IPv4RangeCollection Merge(IEnumerable<IPv4Range> pRangeDatas)
+		{
+			// コピーを作る。
+			IPv4RangeCollection result = new IPv4RangeCollection();
+			foreach (IPv4Range srcRange in pRangeDatas) {
+				result.Add(new IPv4Range(srcRange));
+			}
+			result.SortByMinimumAddress();
+
+			// 結合相手が無くなるまで相手を探して結合する
+			while (result.Count >= 2) {
+				bool blProcessed = false;
+				for (int i = 0; i < result.Count - 1; i++) {
+					for (int j = i + 1; j < result.Count; j++) {
+						OverlapFlags flag = result[i].CheckOverlap(result[j]);
+						if (flag < 0) {
+							continue;
+						} else if ((flag == OverlapFlags.Equal) || (flag == OverlapFlags.Inside)) {
+							result.RemoveAt(j);
+							blProcessed = true;
+							j--;
+						} else if (flag == OverlapFlags.Surrounded) {
+							result.RemoveAt(i);
+							blProcessed = true;
+						} else if ((flag == OverlapFlags.CrossMin) || (flag == OverlapFlags.ContactMin)) {
+							result[i].SetMinMax(result[j].Min, result[i].Max);
+							result.RemoveAt(j);
+							blProcessed = true;
+							j--;
+						} else if ((flag == OverlapFlags.CrossMax) || (flag == OverlapFlags.ContactMax)) {
+							result[i].SetMinMax(result[i].Min, result[j].Max);
+							result.RemoveAt(j);
+							blProcessed = true;
+							j--;
+						}
+					}
+				}
+
+				if (!blProcessed) {
+					break;
+				}
+			}
+
+			return result;
 		}
 	}
 }

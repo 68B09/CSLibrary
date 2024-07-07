@@ -1,7 +1,7 @@
 # IPv4Range
 **概要**
 ==========
-IPv4アドレスを範囲で扱う基本クラスです。  
+IPv4アドレスを範囲で扱うクラスです。  
 
 ●**コンストラクタ**
 ------
@@ -13,6 +13,13 @@ IPv4アドレスを範囲で扱う基本クラスです。
 **public IPv4Range(string pIPv4, int pCount)**  
 
 各種アドレス表記に対応したコンストラクタです。  
+
+●**各表記正規表現**
+------
+**static public readonly Regex regexCIDR**  
+**static public readonly Regex regexMask**  
+
+各アドレス表記の正規表現です。  
 
 ●**最小・最大値取得**
 ------
@@ -63,15 +70,3 @@ CheckOverlapメソッドが返すフラグです。
 **public OverlapFlags CheckOverlap(IPv4Range pTarget)**  
 
 自身とpTargetが持つアドレスの重なり具合を返します。  
-
-●**マージ**
-------
-**static public List&lt;IPv4Range&gt;> Merge(IEnumerable&lt;IPv4Range&gt; pRangeDatas)**  
-
-結合可能なアドレス同士を結合し、マージ後のデータリストを返します。  
-pRangeDatas内のオブジェクトの内容は変更されません。  
-総当たりで処理を行うためデータ数によっては時間がかかります。  
-
- ※[IPv4Range.Min,IPv4Range.Max]※  
-pRangeDatas[0,2],[8,9],[5,6],[3,4],[10,20]  
-return [8,9],[0,6],[10,20] ※ソートされません※  
