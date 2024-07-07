@@ -38,7 +38,7 @@ ___
 本クラスを用いなくともstaticメンバを持っているクラスを作れば済むといえばそれまでですが…  
 ___
 ## [●RingBuffer](/doc/RingBuffer.md)
-リングバッファのコレクションクラス。    
+リングバッファのコレクションクラス。  
 ___
 ## [●ExDrawString](/doc/ExDrawString.md)
 縦書き・横書き対応の拡張DrawStringクラス。  
@@ -64,23 +64,29 @@ ___
 ## [●Pairs](/doc/Pairs.md)
 データを単純に扱うクラス群。  
 ___
+## [●OtherUtility](/doc/OtherUtility.md)
+その他に分類されるクラスやメソッド群。  
+___
 ## ライセンス
-ライセンスを適用するファイルにはライセンスについての記述があります。   
+ライセンスを適用するファイルにはライセンスについての記述があります。  
 The MIT License (MIT)  
 Copyright (c) 2022 68B09  
 ___
 ## 履歴
+2024/7/7 68B09  
+OtherUtility.csを追加。  
+
 2024/7/4 68B09  
-IPv4.cs、Pairs.csを追加。
+IPv4.cs、Pairs.csを追加。  
 
 2024/1/8 68B09  
-CSLibraryConstants.cs,DPIUnit.csを追加。
+CSLibraryConstants.cs,DPIUnit.csを追加。  
 
 2022/5/28 68B09  
-BCDUtility.csを追加。
+BCDUtility.csを追加。  
 
 2022/4/30 68B09  
-CSGeometries.Unitsを追加。
+CSGeometries.Unitsを追加。  
 
 2021/12/30 68B09  
 ExFileStreamおよびByteArrayUtilityを追加。  
@@ -93,4 +99,3 @@ CSVAssistant.cs、WaitCursor.cs、SharedData.cs、RingBuffer.csを追加。
 
 2021/7/22 68B09  
 First release.
-
