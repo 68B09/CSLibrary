@@ -613,10 +613,7 @@ namespace CSLibrary.Network
 				for (int i = 0; i < result.Count - 1; i++) {
 					for (int j = i + 1; j < result.Count; j++) {
 						OverlapFlags flag = result[i].CheckOverlap(result[j]);
-						if (flag ==  OverlapFlags.Min) {
-							// ソートされている状態で[i]>[j]はありえない
-							throw new InvalidProgramException();
-						}else if (flag ==  OverlapFlags.Max) {
+						if (flag == OverlapFlags.Max) {
 							// これ以降も相手が大きいので相手探しをやめて次へ
 							break;
 						} else if ((flag == OverlapFlags.Equal) || (flag == OverlapFlags.Inside)) {
@@ -628,14 +625,17 @@ namespace CSLibrary.Network
 							blProcessed = true;
 							i--;
 							break;
-						} else if ((flag == OverlapFlags.CrossMin) || (flag == OverlapFlags.ContactMin)) {
-							// ソートされている状態で[i]>[j]はありえない
-							throw new InvalidProgramException();
 						} else if ((flag == OverlapFlags.CrossMax) || (flag == OverlapFlags.ContactMax)) {
 							result[i].SetMinMax(result[i].Min, result[j].Max);
 							result.RemoveAt(j);
 							blProcessed = true;
 							j--;
+						} else {
+							// OverlapFlags.Min
+							// OverlapFlags.CrossMin
+							// OverlapFlags.ContactMin
+							// ソートされている状態で[i]>[j]はありえない
+							throw new InvalidProgramException();
 						}
 					}
 				}
