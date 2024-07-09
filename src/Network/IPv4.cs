@@ -501,12 +501,12 @@ namespace CSLibrary.Network
 
 			// 小さい方に重なる(小さい方を拡張できる)？
 			if (this.InRange(pTarget.min)) {
-				return OverlapFlags.CrossMin;
+				return OverlapFlags.CrossMax;
 			}
 
 			// 大きい方に重なる(大きい方を拡張できる)？
 			if (this.InRange(pTarget.max)) {
-				return OverlapFlags.CrossMax;
+				return OverlapFlags.CrossMin;
 			}
 
 			throw new InvalidProgramException();
