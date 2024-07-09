@@ -61,6 +61,8 @@ namespace CSLibrary
 		/// <summary>
 		/// 年月日などを連結した値を取得
 		/// </summary>
+		/// <param name="pSrc">DateTime</param>
+		/// <param name="pFlag">結合フラグ</param>
 		/// <remarks>
 		/// pFlagで指定された項目を並べた値を返します。
 		/// 項目の並び順はCombineFlagsの定義順(Yearが先頭)です。

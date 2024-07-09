@@ -560,11 +560,18 @@ namespace CSLibrary.Network
 		/// ソート
 		/// </summary>
 		/// <remarks>
-		/// 最小アドレス(Min)をキーに昇順ソートを行います。
+		/// アドレス(Min,Max)をキーに昇順ソートを行います。
 		/// </remarks>
 		public void SortByMinimumAddress()
 		{
-			this.Sort((x, y) => x.Min.CompareTo(y.Min));
+			this.Sort((x, y) =>
+			{
+				int cmp = x.Min.CompareTo(y.Min);
+				if (cmp != 0) {
+					return cmp;
+				}
+				return x.Max.CompareTo(y.Max);
+			});
 		}
 
 		/// <summary>
@@ -606,8 +613,12 @@ namespace CSLibrary.Network
 				for (int i = 0; i < result.Count - 1; i++) {
 					for (int j = i + 1; j < result.Count; j++) {
 						OverlapFlags flag = result[i].CheckOverlap(result[j]);
-						if (flag < 0) {
-							continue;
+						if (flag ==  OverlapFlags.Min) {
+							// ソートされている状態で[i]>[j]はありえない
+							throw new InvalidProgramException();
+						}else if (flag ==  OverlapFlags.Max) {
+							// これ以降も相手が大きいので相手探しをやめて次へ
+							break;
 						} else if ((flag == OverlapFlags.Equal) || (flag == OverlapFlags.Inside)) {
 							result.RemoveAt(j);
 							blProcessed = true;
@@ -615,11 +626,11 @@ namespace CSLibrary.Network
 						} else if (flag == OverlapFlags.Surrounded) {
 							result.RemoveAt(i);
 							blProcessed = true;
+							i--;
+							break;
 						} else if ((flag == OverlapFlags.CrossMin) || (flag == OverlapFlags.ContactMin)) {
-							result[i].SetMinMax(result[j].Min, result[i].Max);
-							result.RemoveAt(j);
-							blProcessed = true;
-							j--;
+							// ソートされている状態で[i]>[j]はありえない
+							throw new InvalidProgramException();
 						} else if ((flag == OverlapFlags.CrossMax) || (flag == OverlapFlags.ContactMax)) {
 							result[i].SetMinMax(result[i].Min, result[j].Max);
 							result.RemoveAt(j);
