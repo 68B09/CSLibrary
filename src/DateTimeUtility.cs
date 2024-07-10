@@ -118,5 +118,64 @@ namespace CSLibrary
 
 			return result;
 		}
+
+		/// <summary>
+		/// パース
+		/// </summary>
+		/// <param name="pValue">連結値</param>
+		/// <param name="pFlag">結合フラグ</param>
+		/// <returns>DateTime</returns>
+		/// <remarks>
+		/// CombinedBinary()の値からDateTimeを作成します。
+		/// pFlagに指定できるフラグはYear,Month,Day,Hour,Minute,Second,Milliの組み合わせのみです。
+		/// 省略された日付には1、時刻には0があてられます。
+		/// 例えばDayとHourのみを指定した場合、"0001/01/dd hh:00:00.000"のDateTimeが返されます。
+		/// </remarks>
+		static public DateTime Parse(long pValue, CombineFlags pFlag = CombineFlags.YYYYMMDDHHMMSS)
+		{
+			if ((pFlag & ~(CombineFlags.YYYYMMDDHHMMSS | CombineFlags.Milli)) != CombineFlags.None) {
+				throw new ArgumentOutOfRangeException();
+			}
+
+			int year = 1;
+			int month = 1;
+			int day = 1;
+			int hour = 0;
+			int minute = 0;
+			int second = 0;
+			int milli = 0;
+
+			if ((pFlag & CombineFlags.Milli) != CombineFlags.None) {
+				milli = (int)(pValue % 1000);
+				pValue /= 1000;
+			}
+			if ((pFlag & CombineFlags.Second) != CombineFlags.None) {
+				second = (int)(pValue % 100);
+				pValue /= 100;
+			}
+			if ((pFlag & CombineFlags.Minute) != CombineFlags.None) {
+				minute = (int)(pValue % 100);
+				pValue /= 100;
+			}
+			if ((pFlag & CombineFlags.Hour) != CombineFlags.None) {
+				hour = (int)(pValue % 100);
+				pValue /= 100;
+			}
+
+			if ((pFlag & CombineFlags.Day) != CombineFlags.None) {
+				day = (int)(pValue % 100);
+				pValue /= 100;
+			}
+			if ((pFlag & CombineFlags.Month) != CombineFlags.None) {
+				month = (int)(pValue % 100);
+				pValue /= 100;
+			}
+			if ((pFlag & CombineFlags.Year) != CombineFlags.None) {
+				year = (int)(pValue % 10000);
+				pValue /= 10000;
+			}
+
+			return new DateTime(year, month, day, hour, minute, second, milli);
+		}
 	}
 }

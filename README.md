@@ -64,6 +64,9 @@ ___
 ## [●Pairs](/doc/Pairs.md)
 データを単純に扱うクラス群。  
 ___
+## [●DateTimeUtility](/doc/DateTimeUtility.md)
+System.DateTimeの拡張メソッドなどを収めたクラスです。  
+___
 ## [●OtherUtility](/doc/OtherUtility.md)
 その他に分類されるクラスやメソッド群。  
 ___
@@ -73,6 +76,9 @@ The MIT License (MIT)
 Copyright (c) 2022 68B09  
 ___
 ## 履歴
+2024/7/10 68B09  
+DateTimeUtility.csを追加。  
+
 2024/7/7 68B09  
 OtherUtility.csを追加。  
 
