@@ -810,10 +810,12 @@ namespace CSLibrary
 		static public IEnumerable<string> CharacterEnumeratorBySurrogate(string pString)
 		{
 			for (int i = 0; i < pString.Length; i++) {
-				if (char.IsSurrogatePair(pString, i)) {
-					yield return pString.Substring(i, 2);
-					i++;
-					continue;
+				if ((i + 1) < pString.Length) {
+					if (char.IsSurrogatePair(pString, i)) {
+						yield return pString.Substring(i, 2);
+						i++;
+						continue;
+					}
 				}
 
 				yield return pString[i].ToString();
