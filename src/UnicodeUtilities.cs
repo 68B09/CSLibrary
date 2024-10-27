@@ -89,6 +89,8 @@ namespace CSLibrary
 		public const int HIMOJI_PLANE_LOW = 0xFFFE;         // 全面内非文字最小
 		public const int HIMOJI_PLANE_HIGH = 0xFFFF;        // 全面内非文字最大
 
+		public const int REPLACECHAR = 0xFFFD;				// replacement character
+
 		#region 文字変換用データ
 		/// <summary>
 		/// 文字変換用記号辞書データ
@@ -850,30 +852,30 @@ namespace CSLibrary
 		/// </summary>
 		/// <param name="pString">変換元文字列</param>
 		/// <returns>コードポイント(UTF-32)</returns>
+		/// <remarks>
+		/// ペアになっていないサロゲートぺアのコードはリプレースメント文字(U+FFFD)に置き換えられます。
+		/// </remarks>
 		static public IEnumerable<int> ConvertToUtf32(string pString)
 		{
-			char? before = null;
+			char[] srcChars = pString.ToCharArray();
+			List<int> utf32List = new List<int>(pString.Length);
 
-			foreach (char c in pString) {
-				if (before == null) {
-					before = c;
-					continue;
+			for (int i = 0; i < srcChars.Length; i++) {
+				char c = srcChars[i];
+				if (!char.IsHighSurrogate(c)) {
+					if (!char.IsLowSurrogate(c)) {
+						utf32List.Add(c);
+					} else {
+						utf32List.Add(REPLACECHAR);
+					}
+				} else if (((i + 1) < srcChars.Length) && char.IsLowSurrogate(srcChars[i + 1])) {
+					int codePoint = char.ConvertToUtf32(c, srcChars[++i]);
+					utf32List.Add(codePoint);
+				} else {
+					utf32List.Add(REPLACECHAR);
 				}
-
-				if (char.IsSurrogatePair(before.Value, c) == false) {
-					yield return before.Value;
-					before = c;
-					continue;
-				}
-
-				// サロゲートペアの場合
-				yield return char.ConvertToUtf32(before.Value, c);
-				before = null;
 			}
-
-			if (before != null) {
-				yield return before.Value;
-			}
+			return utf32List;
 		}
 
 		/// <summary>

@@ -21,6 +21,9 @@ UnicodeUtilityに入れるほどでは無い文字処理を収めたクラス。
 ・ファイルパスの短縮  
 etc..  
 ___
+## [●AimaiKensaku](/doc/AimaiKensaku.md)
+あいまい検索を行うクラス。  
+___
 ## [●CSVAssistant](/doc/CSVAssistant.md)
 CSVファイルを読み書きするためのクラス。  
 フィールド単位で""で囲まれていたか否か判別可能。  
