@@ -1,4 +1,5 @@
-﻿# CSGeometries.Geometry
+﻿# CSGeometries.Geometry  
+
 **概要**
 ==========
 https://github.com/68B09/CSGeometries をCSLibraryに移動させたものです。  
@@ -103,6 +104,7 @@ pMinもしくはpMaxの点が座標列中に存在しない場合もあること
 
 <a name="Saturation"></a>●**飽和丸め**  
 **public static double Saturation(double pValue, double pMin = 0.0, double pMax = 1.0)**  
+**public static T Saturation&lt;T&gt;(T pValue, T pMin, T pMax) where T : IComparable&lt;T&gt;**  
 pValueの値が最小(pMin)から最大(pMax)の範囲に収まるように調整し、その値を返します。  
 (ex)Saturation(-1.0, 1.0, 10.0) → 1.0  
 (ex)Saturation(11.0, 1.0, 10.0) → 10.0  
@@ -140,8 +142,33 @@ pValueの素因数分解を行い因数のリストを返します。
 pValueが1未満の場合は例外をスローします。  
 (ex)PrimeFactorization(3 * 4 * 5 * 7 * 11) → [2,2,3,5,7,11]  
 
+●**インチ→ミリメートル**  
+**public const double InchToMm = 25.4;**  
+ans_mm = inch * `Geometry.InchToMm`;
+
+●**ミリメートル→インチ**  
+**public const double MmToInch  = 1.0 / 25.4;**  
+ans_inch = mm * `Geometry.MmToInch`;
+
+●**インチ→ポイント**  
+**public const double InchToPoint = 72.0;**  
+ans_pt = inch * `Geometry.InchToPoint`;
+
+●**ポイント→インチ**  
+**public const double PointToInch = 1.0 / 72.0;**  
+ans_inch = pt * `Geometry.PointToInch`;
+
+●**ミリメートル→ポイント**  
+**public const double MmToPoint = 72.0 / 25.4;**  
+ans_pt = mm * `Geometry.MmToPoint`;
+
+●**ポイント→ミリメートル**  
+**public const double PointToMm = 25.4 / 72.0;**  
+ans_mm = pt * `Geometry.PointToMm`;
+
 ------
 # CSGeometries.Units
+
 **概要**
 ==========
 SIなどの単位に関するクラス群です。  

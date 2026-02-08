@@ -70,6 +70,9 @@ ___
 ## [●DateTimeUtility](/doc/DateTimeUtility.md)
 System.DateTimeの拡張メソッドなどを収めたクラスです。  
 ___
+## [●NotifyPropertyChangedBase](/doc/NotifyPropertyChangedBase.md)
+INotifyPropertyChangedの実装を助けるユーティリティークラスです。  
+___
 ## [●OtherUtility](/doc/OtherUtility.md)
 その他に分類されるクラスやメソッド群。  
 ___
@@ -79,6 +82,9 @@ The MIT License (MIT)
 Copyright (c) 2022 68B09  
 ___
 ## 履歴
+2026/2/8 68B09  
+●NotifyPropertyChangedBase.csを追加。  
+
 2024/7/10 68B09  
 DateTimeUtility.csを追加。  
 

@@ -32,6 +32,56 @@ namespace CSLibrary.CSGeometries
 	/// </summary>
 	public partial class Geometry
 	{
+		#region フィールド/プロパティー
+		/// <summary>
+		/// インチをミリメートルへ変換
+		/// </summary>
+		/// <remarks>
+		/// double ans_mm = inch * InchToMm;
+		/// </remarks>
+		public const double InchToMm = 25.4;
+
+		/// <summary>
+		/// ミリメートルをインチへ変換
+		/// </summary>
+		/// <remarks>
+		/// double ans_inch = mm * MmToInch;
+		/// </remarks>
+		public const double MmToInch  = 1.0 / 25.4;
+
+		/// <summary>
+		/// インチをポイント(文字サイズ)へ変換
+		/// </summary>
+		/// <remarks>
+		/// double ans_pt = inch * InchToPoint;
+		/// </remarks>
+		public const double InchToPoint = 72.0;
+
+		/// <summary>
+		/// ポイント(文字サイズ)をインチへ変換
+		/// </summary>
+		/// <remarks>
+		/// double ans_inch = pt * PointToInch;
+		/// </remarks>
+		public const double PointToInch = 1.0 / 72.0;
+
+		/// <summary>
+		/// ミリメートルをポイント(文字サイズ)へ変換。
+		/// </summary>
+		/// <remarks>
+		/// double ans_pt = mm * MmToPoint;
+		/// </remarks>
+		public const double MmToPoint = 72.0 / 25.4;
+
+		/// <summary>
+		/// ポイント(文字サイズ)をミリメートルへ変換
+		/// </summary>
+		/// <remarks>
+		/// double ans_mm = pt * PointToMm;
+		/// </remarks>
+		public const double PointToMm = 25.4 / 72.0;
+		#endregion
+
 		/// <summary>
 		/// 線分長取得
 		/// </summary>
@@ -428,6 +478,24 @@ namespace CSLibrary.CSGeometries
 			} else if (pValue > pMax) {
 				return pMax;
 			}
+			return pValue;
+		}
+
+		/// <summary>
+		/// 飽和丸め(型指定)
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="pValue">値</param>
+		/// <param name="pMin">下限値</param>
+		/// <param name="pMax">上限値</param>
+		/// <returns>飽和処理後の値</returns>
+		/// <remarks>
+		/// pValueが上下限値内に収まるように調整する。
+		/// </remarks>
+		public static T Saturation<T>(T pValue, T pMin, T pMax) where T : IComparable<T>
+		{
+			if (pValue.CompareTo(pMin) < 0) return pMin;
+			if (pValue.CompareTo(pMax) > 0) return pMax;
 			return pValue;
 		}
 
