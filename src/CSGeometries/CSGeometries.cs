@@ -47,7 +47,7 @@ namespace CSLibrary.CSGeometries
 		/// <remarks>
 		/// double ans_inch = mm * MmToInch;
 		/// </remarks>
-		public const double MmToInch  = 1.0 / 25.4;
+		public const double MmToInch = 1.0 / 25.4;
 
 		/// <summary>
 		/// インチをポイント(文字サイズ)へ変換
@@ -80,6 +80,14 @@ namespace CSLibrary.CSGeometries
 		/// double ans_mm = pt * PointToMm;
 		/// </remarks>
 		public const double PointToMm = 25.4 / 72.0;
+
+		/// <summary>
+		/// ゼロと見なす値
+		/// </summary>
+		/// <remarks>
+		/// 「本値以下はゼロと見なす」ときの定数。
+		/// </remarks>
+		public const double ZeroTolerance = 1e-12;
 		#endregion
 
 		/// <summary>
@@ -163,7 +171,9 @@ namespace CSLibrary.CSGeometries
 		public static PointD GetCrossPoint(PointD pL1_1, PointD pL1_2, PointD pL2_1, PointD pL2_2, out bool pIsCross)
 		{
 			double keisu = IsCross(pL1_1, pL1_2, pL2_1, pL2_2);
-			pIsCross = keisu != 0.0;
+			double len1 = GetLength(pL1_1, pL1_2);
+			double len2 = GetLength(pL2_1, pL2_2);
+			pIsCross = Math.Abs(keisu) > (ZeroTolerance * len1 * len2);
 			if (pIsCross == false) {
 				return new PointD(0, 0);
 			}
@@ -434,6 +444,7 @@ namespace CSLibrary.CSGeometries
 
 			pAngle = (l3 * l3) - (l2 * l2) - (l1 * l1);
 			pAngle = pAngle / (-2.0 * l1 * l2);
+			pAngle = Saturation(pAngle, -1.0, 1.0);
 			pAngle = Math.Acos(pAngle);
 
 			return true;
@@ -554,7 +565,7 @@ namespace CSLibrary.CSGeometries
 				return 0;
 			}
 
-			return (p1 * p2) / GCD(p1, p2);
+			return (p1 / GCD(p1, p2)) * p2;
 		}
 
 		/// <summary>
@@ -586,7 +597,7 @@ namespace CSLibrary.CSGeometries
 				}
 
 				n = 3;
-				while (n < pValue) {
+				while ((n * n) <= pValue) {
 					while ((pValue % n) == 0) {
 						list.Add(n);
 						pValue /= n;
